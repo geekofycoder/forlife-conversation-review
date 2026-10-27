@@ -30,6 +30,7 @@
   --danger: #f0a29a; --danger-bg: #3d2221; --code: #2a2c27;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 Inter, system-ui, -apple-system, sans-serif; }
 a { color: var(--accent); }
@@ -118,6 +119,61 @@ tr:last-child td { border-bottom: 0; }
 pre { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto;
   font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
 footer { color: var(--muted); font-size: 12.5px; padding: 24px 0 40px; border-top: 1px solid var(--line); }
+/* comments */
+.cbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 14px; font-size: 13.5px; }
+.cbar-btn { font: 500 13.5px Inter, system-ui, sans-serif; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink); cursor: pointer; }
+.cbar-btn:hover { border-color: var(--accent); }
+.cbar-btn.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.cbar-btn:disabled { opacity: .6; cursor: default; }
+.cbar-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.cbar-form input { font: inherit; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); width: 170px; }
+.cbar-on { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; color: var(--muted); }
+.cbar-on b { color: var(--ink); }
+.linkish { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.c-err { color: var(--danger); font-size: 13px; }
+.commenting [data-c] { position: relative; padding-right: 52px; }
+.commenting tr[data-c] { padding-right: 0; }
+.commenting tr[data-c] > td:last-child { position: relative; padding-right: 58px; }
+.c-btn { display: none; position: absolute; top: 2px; right: 0; align-items: center; font: 500 12px/1 Inter, system-ui, sans-serif;
+  padding: 4px 7px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; z-index: 2; }
+.turn > .c-btn { top: 12px; }
+td > .c-btn { top: 8px; right: 6px; }
+.c-btn:hover { border-color: var(--accent); color: var(--accent); }
+.c-btn.has { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.commenting [data-c]:hover > .c-btn, .commenting tr[data-c]:hover > td > .c-btn, .commenting .tapped > .c-btn,
+.commenting .tapped > td > .c-btn, .commenting .c-btn.has, .commenting .c-btn.open { display: inline-flex; }
+::highlight(cquote) { background-color: rgba(255, 205, 0, .38); }
+.sel-btn { position: absolute; z-index: 20; font: 600 12.5px Inter, system-ui, sans-serif; padding: 7px 11px; border-radius: 8px; border: 0;
+  background: var(--ink); color: var(--surface); box-shadow: 0 4px 14px rgba(0, 0, 0, .2); cursor: pointer; }
+.thread { margin: 6px 0 14px; padding: 12px 14px; border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 8px;
+  background: var(--surface); font: 14px/1.5 Inter, system-ui, sans-serif; color: var(--ink); text-align: left; }
+tr.thread-row > td { background: var(--bg); padding: 2px 12px 8px; }
+.c-item { padding: 8px 0; border-bottom: 1px solid var(--line); }
+.t-items > .c-item:last-child { border-bottom: 0; }
+.c-replies { margin: 6px 0 0 6px; padding-left: 12px; border-left: 2px solid var(--line); }
+.c-replies .c-item { border-bottom: 0; padding: 6px 0; }
+.c-meta { font-size: 12.5px; color: var(--muted); }
+.c-meta b { color: var(--ink); font-weight: 600; }
+.c-q { margin: 4px 0; padding: 1px 8px; border-left: 3px solid #e2bf2c; color: var(--muted); font-style: italic; }
+.c-body { white-space: pre-wrap; overflow-wrap: anywhere; }
+.c-acts { display: flex; gap: 12px; align-items: center; font-size: 12.5px; margin-top: 3px; color: var(--muted); }
+.t-empty { color: var(--muted); font-size: 13px; margin: 0 0 6px; }
+.t-ctx { font-size: 12.5px; color: var(--muted); margin: 8px 0 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.t-ctx q { font-style: italic; color: var(--ink); }
+.thread textarea { display: block; width: 100%; min-height: 64px; resize: vertical; font: inherit; padding: 8px 10px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--bg); color: var(--ink); }
+.thread textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.t-actions { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
+.orphans:empty { display: none; }
+.orphans { margin-top: 22px; padding: 12px 14px; border: 1px dashed var(--muted); border-radius: 10px; }
+.orphans h4 { margin: 0 0 4px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.orphan-line { font-size: 13.5px; color: var(--muted); margin: 12px 0 4px; }
+.pick { position: relative; }
+.pick-c, .tab-c { font: 600 11px/1 Inter, system-ui, sans-serif; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 6px; }
+.pick-c { position: absolute; top: 8px; right: 8px; }
+.pick:has(.pick-c) { padding-right: 56px; }
+.tab-c { margin-left: 6px; }
 @media (max-width: 860px) {
   .layout { grid-template-columns: 1fr; }
   .picker { display: none; }
@@ -134,14 +190,30 @@ footer { color: var(--muted); font-size: 12.5px; padding: 24px 0 40px; border-to
     <p class="kicker">ForLife · Vera chat redesign · PM review</p>
     <h1>The ideal conversation: a draft from 34 real chats, for PM review</h1>
     <div class="status"><span><b>Draft</b> for discussion</span><span>Question order not yet reviewed by a doctor</span><span>Updated 27 Oct 2026, 13:42</span></div>
-    <details class="about"><summary>About this draft</summary><p>Source: <code>conversations.json</code> (34 episodes, 172 answered questions) and the counts in <code>question_analysis.md</code>. Many episodes are the team testing the app, so read the numbers as direction, not proof. Episode ids like <a class="ep" href="#episode-C" title="Open episode C">39ae9855-1</a> point to the real chat. <strong>Text only.</strong> No buttons, tap options or checklists: everything below is what Vera writes and what the patient types. This is a draft to discuss. The app and its prompt are unchanged. Full chat text lives here: keep it in the git-ignored <code>benchmark/</code> folder.</p></details>
+    <div class="cbar">
+      <button type="button" class="cbar-btn" id="c-on">💬 Turn on comments</button>
+      <form class="cbar-form" id="c-form" hidden>
+        <input id="c-name" placeholder="Your name" maxlength="40" autocomplete="name" aria-label="Your name" required>
+        <input id="c-pass" type="password" placeholder="Passcode" autocomplete="current-password" aria-label="Passcode" required>
+        <button type="submit" class="cbar-btn primary">Turn on</button>
+        <span class="c-err" id="c-form-err" role="alert"></span>
+      </form>
+      <div class="cbar-on" id="c-status" hidden>
+        <span>💬 Commenting as <b id="c-who"></b></span>
+        <span id="c-total"></span>
+        <span class="cbar-hint">Point at a line and click 💬, or select words and click <b>Comment</b>.</span>
+        <button type="button" class="linkish" id="c-refresh">Refresh</button>
+        <button type="button" class="linkish" id="c-off">Turn off</button>
+      </div>
+    </div>
+    <details class="about"><summary>About this draft</summary><p data-c="about:be5b0984">Source: <code>conversations.json</code> (34 episodes, 172 answered questions) and the counts in <code>question_analysis.md</code>. Many episodes are the team testing the app, so read the numbers as direction, not proof. Episode ids like <a class="ep" href="#episode-C" title="Open episode C">39ae9855-1</a> point to the real chat. <strong>Text only.</strong> No buttons, tap options or checklists: everything below is what Vera writes and what the patient types. This is a draft to discuss. The app and its prompt are unchanged. Full chat text lives here: keep it in the git-ignored <code>benchmark/</code> folder.</p><div class="orphans" data-orphans="about"></div></details>
     <nav class="tabs" aria-label="Sections"><a class="tab" href="#episodes" data-tab="episodes">Episodes (9)</a><a class="tab" href="#findings" data-tab="findings">Findings</a><a class="tab" href="#shape" data-tab="shape">Goal &amp; shape</a><a class="tab" href="#rewrites" data-tab="rewrites">Rewrites</a><a class="tab" href="#evidence" data-tab="evidence">Evidence &amp; prompt</a><a class="tab" href="#decisions" data-tab="decisions">Decisions</a></nav>
   </div>
 </div>
 <main class="wrap">
   <div class="panel" data-panel="episodes" hidden>
-    <div class="callout"><p><strong>What to look for as you read the nine conversations (section 5):</strong></p>
-<ol><li>Does Vera sound like a family doctor the patient has known for years?</li><li>Does each reply ask one thing, and does it feel like the next natural thing to ask?</li><li>Does the patient get room to say how it feels, in their own words?</li><li>Is anything a doctor would want to know missing? (The question order and the "what I'm thinking" lines have not been reviewed by a doctor.)</li></ol></div>
+    <div class="callout"><p data-c="episodes:a647032f"><strong>What to look for as you read the nine conversations (section 5):</strong></p>
+<ol><li data-c="episodes:8ade3bd2">Does Vera sound like a family doctor the patient has known for years?</li><li data-c="episodes:07c3fe3f">Does each reply ask one thing, and does it feel like the next natural thing to ask?</li><li data-c="episodes:f922bf22">Does the patient get room to say how it feels, in their own words?</li><li data-c="episodes:384e6790">Is anything a doctor would want to know missing? (The question order and the "what I'm thinking" lines have not been reviewed by a doctor.)</li></ol></div>
     <div class="legend">
       <span><span class="tag real">real</span> the patient's actual words</span>
       <span><span class="tag expected">expected</span> built from facts they gave later</span>
@@ -152,165 +224,166 @@ footer { color: var(--muted); font-size: 12.5px; padding: 24px 0 40px; border-to
       <aside class="picker" aria-label="Choose an episode"><h3>Choose an episode</h3><button class="pick" data-ep="A"><span class="letter">A</span><span class="pick-text"><span class="pick-title">Not passed stool for 3 days</span><span class="pick-sub">Writes 1-2 words · 9 → 6</span></span></button><button class="pick" data-ep="B"><span class="letter">B</span><span class="pick-text"><span class="pick-title">Child with pain in the buttock</span><span class="pick-sub">Shy, types for a child · 8 → 6</span></span></button><button class="pick" data-ep="C"><span class="letter">C</span><span class="pick-text"><span class="pick-title">Gud gudi in the stomach</span><span class="pick-sub">Hinglish, voices a fear · 9 → 6</span></span></button><button class="pick" data-ep="D"><span class="letter">D</span><span class="pick-text"><span class="pick-title">Sudden stomach pain after a shawarma</span><span class="pick-sub">Greeting only, then talkative · 9 → 8</span></span></button><button class="pick" data-ep="E"><span class="letter">E</span><span class="pick-text"><span class="pick-title">Wife's period is late</span><span class="pick-sub">Typing for someone else, shy, joking · 9 → 6</span></span></button><button class="pick" data-ep="F"><span class="letter">F</span><span class="pick-text"><span class="pick-title">One-year-old drooling</span><span class="pick-sub">Terse parent · 9 → 7</span></span></button><button class="pick" data-ep="G"><span class="letter">G</span><span class="pick-text"><span class="pick-title">Swollen gum at the back</span><span class="pick-sub">Moderate, many red-flag checks · 13 → 10</span></span></button><button class="pick" data-ep="H"><span class="letter">H</span><span class="pick-text"><span class="pick-title">Ears feel like in an aeroplane</span><span class="pick-sub">Expressive, uses a comparison · 13 → 10</span></span></button><button class="pick" data-ep="K"><span class="letter">K</span><span class="pick-text"><span class="pick-title">Grandfather with fever and trouble swallowing</span><span class="pick-sub">Worried family member · 6 → 5</span></span></button></aside>
       <div>
         <div class="mobile-pick"><label for="ep-select">Episode</label><select id="ep-select"><option value="A">A · Not passed stool for 3 days</option><option value="B">B · Child with pain in the buttock</option><option value="C">C · Gud gudi in the stomach</option><option value="D">D · Sudden stomach pain after a shawarma</option><option value="E">E · Wife&#x27;s period is late</option><option value="F">F · One-year-old drooling</option><option value="G">G · Swollen gum at the back</option><option value="H">H · Ears feel like in an aeroplane</option><option value="K">K · Grandfather with fever and trouble swallowing</option></select></div>
-        <article class="episode" id="ep-A" data-ep="A" hidden><header class="ep-head"><p class="eyebrow">Episode A · <code>2e103fa2-1</code></p><h2>The short-answer patient</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Writes 1-2 words</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">9 → 6</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">3 of 6</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">Invitation, one push, check-back</span></div></div></header><div class="script">
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>I haven't pooped since 3 days</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Three days without going, that must be uncomfortable. Tell me how it's been for you, however it comes.</p><div class="note">a short message that says nothing about how it feels: one invitation, and no question with it</div></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag expected">expected</span><span class="detail">from his real answer "Lower"</span></div><div class="said"><p>Lower belly hurts.</p><div class="note">still short, and nothing about how it feels, so Vera pushes once</div></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Hmm, lower belly. Say it however it comes, no need to be exact. What does it feel like?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag expected">expected</span><span class="detail">facts he gave elsewhere in the real chat; he never described a feeling there</span></div><div class="said"><p>Normally I'm regular so this is odd. Gas is passing, no vomiting.</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>That's out of the ordinary for you, and passing gas is a good sign. Has your food or water changed lately?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>No</p></div></div>
-<div class="turn thinking"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>So far this looks most like simple constipation, where the gut moves slowly. I want to be sure it's nothing more.</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Any fever with it?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>No</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>So: three days, lower belly ache, gas passing, no fever. Is there something else I should know?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag expected">expected</span></div><div class="said"><p>No.</p></div></div>
+        <article class="episode" id="ep-A" data-ep="A" data-section="ep-A" hidden><header class="ep-head"><p class="eyebrow">Episode A · <code>2e103fa2-1</code></p><h2 data-c="ep-A:a07f7924">The short-answer patient</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Writes 1-2 words</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">9 → 6</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">3 of 6</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">Invitation, one push, check-back</span></div></div></header><div class="script">
+<div class="turn patient" data-c="ep-A:a11c7434"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>I haven't pooped since 3 days</p></div></div>
+<div class="turn vera" data-c="ep-A:53cb5f33"><div class="who">Vera</div><div class="said"><p>Three days without going, that must be uncomfortable. Tell me how it's been for you, however it comes.</p><div class="note">a short message that says nothing about how it feels: one invitation, and no question with it</div></div></div>
+<div class="turn patient" data-c="ep-A:ff193621"><div class="who">Patient <span class="tag expected">expected</span><span class="detail">from his real answer "Lower"</span></div><div class="said"><p>Lower belly hurts.</p><div class="note">still short, and nothing about how it feels, so Vera pushes once</div></div></div>
+<div class="turn vera" data-c="ep-A:aa4b6c2b"><div class="who">Vera</div><div class="said"><p>Hmm, lower belly. Say it however it comes, no need to be exact. What does it feel like?</p></div></div>
+<div class="turn patient" data-c="ep-A:afbf6f1c"><div class="who">Patient <span class="tag expected">expected</span><span class="detail">facts he gave elsewhere in the real chat; he never described a feeling there</span></div><div class="said"><p>Normally I'm regular so this is odd. Gas is passing, no vomiting.</p></div></div>
+<div class="turn vera" data-c="ep-A:f7ce2735"><div class="who">Vera</div><div class="said"><p>That's out of the ordinary for you, and passing gas is a good sign. Has your food or water changed lately?</p></div></div>
+<div class="turn patient" data-c="ep-A:6616985b"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>No</p></div></div>
+<div class="turn thinking" data-c="ep-A:f0c23913"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>So far this looks most like simple constipation, where the gut moves slowly. I want to be sure it's nothing more.</p></div></div>
+<div class="turn vera" data-c="ep-A:5cfde20d"><div class="who">Vera</div><div class="said"><p>Any fever with it?</p></div></div>
+<div class="turn patient" data-c="ep-A:6616985b:1"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>No</p></div></div>
+<div class="turn vera" data-c="ep-A:81ac10a7"><div class="who">Vera</div><div class="said"><p>So: three days, lower belly ache, gas passing, no fever. Is there something else I should know?</p></div></div>
+<div class="turn patient" data-c="ep-A:998f5ff4"><div class="who">Patient <span class="tag expected">expected</span></div><div class="said"><p>No.</p></div></div>
 <div class="turn assessment"><div class="who"></div><div class="said">Vera gives the assessment</div></div>
-</div><div class="after">This patient never described a feeling in the real chat, so his expected reply to the push is only facts. Whether a real patient opens up after a push is what the next step tests.</div><div class="ep-nav"><span></span><a href="#episode-B">Episode B →</a></div></article><article class="episode" id="ep-B" data-ep="B" hidden><header class="ep-head"><p class="eyebrow">Episode B · <code>203e8102-9</code></p><h2>The shy patient (a parent typing for a child)</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Shy, types for a child</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">8 → 6</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">2 of 6</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">Normalising, a plain-words place</span></div></div></header><div class="script">
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p><span class="name" title="A real name, left out">name</span> is having pain in his buttocks</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Oh, poor thing. Say it as plainly as you like, doctors hear this every day. Where does it hurt: the hip side, the middle, near the tailbone, or inside near the passage?</p><div class="note">in the real chat the list had no inside option; the patient picked "middle of the buttock" and said "it is inside anus" three questions later</div></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag expected">expected</span></div><div class="said"><p>Inside, near where he passes stool.</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Thanks for telling me plainly. Does it hurt more when he passes stool?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>yes</p></div></div>
-<div class="turn thinking"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>Pain inside that's worse with stool is often a small tear or piles, usually from hard stools. Let me check how his stools have been.</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Has it been hard to pass lately?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>Yes some blood spots. yes sharp feeling while passing the stools</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>A sharp feeling and a few drops of blood, I see. Any swelling, a lump or fever with it?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>No</p><div class="note">the real answer to the lump question; fever was not asked</div></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>So: pain inside, worse with stool, a sharp feeling, a few drops of blood, nothing else. Is there something else I should know?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag expected">expected</span></div><div class="said"><p>No.</p></div></div>
+</div><div class="after" data-c="ep-A:c9210650">This patient never described a feeling in the real chat, so his expected reply to the push is only facts. Whether a real patient opens up after a push is what the next step tests.</div><div class="orphans" data-orphans="ep-A"></div><div class="ep-nav"><span></span><a href="#episode-B">Episode B →</a></div></article><article class="episode" id="ep-B" data-ep="B" data-section="ep-B" hidden><header class="ep-head"><p class="eyebrow">Episode B · <code>203e8102-9</code></p><h2 data-c="ep-B:f6906b8e">The shy patient (a parent typing for a child)</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Shy, types for a child</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">8 → 6</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">2 of 6</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">Normalising, a plain-words place</span></div></div></header><div class="script">
+<div class="turn patient" data-c="ep-B:d4281e46"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p><span class="name" title="A real name, left out">name</span> is having pain in his buttocks</p></div></div>
+<div class="turn vera" data-c="ep-B:eec65f0e"><div class="who">Vera</div><div class="said"><p>Oh, poor thing. Say it as plainly as you like, doctors hear this every day. Where does it hurt: the hip side, the middle, near the tailbone, or inside near the passage?</p><div class="note">in the real chat the list had no inside option; the patient picked "middle of the buttock" and said "it is inside anus" three questions later</div></div></div>
+<div class="turn patient" data-c="ep-B:0b1d7720"><div class="who">Patient <span class="tag expected">expected</span></div><div class="said"><p>Inside, near where he passes stool.</p></div></div>
+<div class="turn vera" data-c="ep-B:e1bdd08c"><div class="who">Vera</div><div class="said"><p>Thanks for telling me plainly. Does it hurt more when he passes stool?</p></div></div>
+<div class="turn patient" data-c="ep-B:08857c06"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>yes</p></div></div>
+<div class="turn thinking" data-c="ep-B:d52f44b4"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>Pain inside that's worse with stool is often a small tear or piles, usually from hard stools. Let me check how his stools have been.</p></div></div>
+<div class="turn vera" data-c="ep-B:0b639b2b"><div class="who">Vera</div><div class="said"><p>Has it been hard to pass lately?</p></div></div>
+<div class="turn patient" data-c="ep-B:e4c11dff"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>Yes some blood spots. yes sharp feeling while passing the stools</p></div></div>
+<div class="turn vera" data-c="ep-B:93bb5cc6"><div class="who">Vera</div><div class="said"><p>A sharp feeling and a few drops of blood, I see. Any swelling, a lump or fever with it?</p></div></div>
+<div class="turn patient" data-c="ep-B:f8ba1d85"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>No</p><div class="note">the real answer to the lump question; fever was not asked</div></div></div>
+<div class="turn vera" data-c="ep-B:2719a928"><div class="who">Vera</div><div class="said"><p>So: pain inside, worse with stool, a sharp feeling, a few drops of blood, nothing else. Is there something else I should know?</p></div></div>
+<div class="turn patient" data-c="ep-B:169f1029"><div class="who">Patient <span class="tag expected">expected</span></div><div class="said"><p>No.</p></div></div>
 <div class="turn assessment"><div class="who"></div><div class="said">Vera gives the assessment</div></div>
-</div><div class="ep-nav"><a href="#episode-A">← Episode A</a><a href="#episode-C">Episode C →</a></div></article><article class="episode" id="ep-C" data-ep="C" hidden><header class="ep-head"><p class="eyebrow">Episode C · <code>39ae9855-1</code></p><h2>The Hinglish patient with a worry</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Hinglish, voices a fear</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">9 → 6</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">0 of 6</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">Hinglish, a guess, answering a fear</span></div></div></header><div class="script">
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>In my right side of stomach I had gud gudi feeling</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Achha, gud gudi, samajh gayi. Right side mein kahan zyada lag raha hai: ribs ke neeche, naabhi ke paas, ya neeche ki taraf?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Right side ribs ke neeche</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Ribs ke neeche, theek hai. Lagta hai jaise halka cramp aata hai, kya aisa hi hai?</p><div class="note">a guess, offered to be checked</div></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Haan ese cramp ho ke 5 sec mein band ho jata</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Achha, bas 5 second ka cramp aur phir band. Ye kab se ho raha hai?</p><div class="note">a story question: it got the longest answer in the real chat</div></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>Abhi just mein bhel puri kha ke aaya spicy tha aur mera liver bhi waha hai na. Aaj hua jese 5 min koi stretch kar deta hai phir band</p></div></div>
-<div class="turn thinking"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>Abhi tak jo suna, spicy khane ke baad gas ya halki acidity aisa karti hai, aur ye chhota cramp usi se milta hai. Liver wali baat bhi dhyaan mein rakh rahi hoon.</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Saath mein ulti jaisa mann ya bukhar hai kya?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Nhii</p><div class="note">the real answers: no nausea, no fever</div></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Theek hai. Kuch aur hai jo main jaan loon?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Nhi par lag raha mujhe dar hai pet na kharap ho abhi recently O2 khaya tha</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Ye dar natural hai, aur aapne bataya, achha kiya. Abhi tak jo hai wo halka lag raha hai.</p></div></div>
+</div><div class="orphans" data-orphans="ep-B"></div><div class="ep-nav"><a href="#episode-A">← Episode A</a><a href="#episode-C">Episode C →</a></div></article><article class="episode" id="ep-C" data-ep="C" data-section="ep-C" hidden><header class="ep-head"><p class="eyebrow">Episode C · <code>39ae9855-1</code></p><h2 data-c="ep-C:20e1d5f9">The Hinglish patient with a worry</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Hinglish, voices a fear</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">9 → 6</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">0 of 6</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">Hinglish, a guess, answering a fear</span></div></div></header><div class="script">
+<div class="turn patient" data-c="ep-C:0b2c2acc"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>In my right side of stomach I had gud gudi feeling</p></div></div>
+<div class="turn vera" data-c="ep-C:05bf662d"><div class="who">Vera</div><div class="said"><p>Achha, gud gudi, samajh gayi. Right side mein kahan zyada lag raha hai: ribs ke neeche, naabhi ke paas, ya neeche ki taraf?</p></div></div>
+<div class="turn patient" data-c="ep-C:010a8466"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Right side ribs ke neeche</p></div></div>
+<div class="turn vera" data-c="ep-C:4265f19d"><div class="who">Vera</div><div class="said"><p>Ribs ke neeche, theek hai. Lagta hai jaise halka cramp aata hai, kya aisa hi hai?</p><div class="note">a guess, offered to be checked</div></div></div>
+<div class="turn patient" data-c="ep-C:cf61e82b"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Haan ese cramp ho ke 5 sec mein band ho jata</p></div></div>
+<div class="turn vera" data-c="ep-C:3e659150"><div class="who">Vera</div><div class="said"><p>Achha, bas 5 second ka cramp aur phir band. Ye kab se ho raha hai?</p><div class="note">a story question: it got the longest answer in the real chat</div></div></div>
+<div class="turn patient" data-c="ep-C:a23be313"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>Abhi just mein bhel puri kha ke aaya spicy tha aur mera liver bhi waha hai na. Aaj hua jese 5 min koi stretch kar deta hai phir band</p></div></div>
+<div class="turn thinking" data-c="ep-C:b10e21ed"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>Abhi tak jo suna, spicy khane ke baad gas ya halki acidity aisa karti hai, aur ye chhota cramp usi se milta hai. Liver wali baat bhi dhyaan mein rakh rahi hoon.</p></div></div>
+<div class="turn vera" data-c="ep-C:5feb3637"><div class="who">Vera</div><div class="said"><p>Saath mein ulti jaisa mann ya bukhar hai kya?</p></div></div>
+<div class="turn patient" data-c="ep-C:3969e564"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Nhii</p><div class="note">the real answers: no nausea, no fever</div></div></div>
+<div class="turn vera" data-c="ep-C:8b0e6781"><div class="who">Vera</div><div class="said"><p>Theek hai. Kuch aur hai jo main jaan loon?</p></div></div>
+<div class="turn patient" data-c="ep-C:09c44a63"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Nhi par lag raha mujhe dar hai pet na kharap ho abhi recently O2 khaya tha</p></div></div>
+<div class="turn vera" data-c="ep-C:9bbfdcd7"><div class="who">Vera</div><div class="said"><p>Ye dar natural hai, aur aapne bataya, achha kiya. Abhi tak jo hai wo halka lag raha hai.</p></div></div>
 <div class="turn assessment"><div class="who"></div><div class="said">Vera gives the assessment</div></div>
-</div><div class="ep-nav"><a href="#episode-B">← Episode B</a><a href="#episode-D">Episode D →</a></div></article><article class="episode" id="ep-D" data-ep="D" hidden><header class="ep-head"><p class="eyebrow">Episode D · <code>b9d47118-1</code></p><h2>The greeting, then a long story</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Greeting only, then talkative</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">9 → 8</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">0 of 8</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">Greeting-only opening, a long story, a guess</span></div></div></header><div class="script">
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Hiii I am <span class="name" title="A real name, left out">name</span></p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Hi <span class="name" title="A real name, left out">name</span>, lovely to meet you. Tell me what's been going on, however it comes.</p><div class="note">a greeting only: the invitation is the whole reply</div></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span><span class="detail">his answer to "what's been bothering you"</span></div><div class="said"><p>Recently in the night I had very sharp stomach pain I woke up and feeling heavy urge to pass the poop and there the liquid poop is coming for me</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>That sounds really rough, especially waking up with it. When did it begin?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span><span class="detail">trimmed</span></div><div class="said"><p>it began yesternight after my dinner</p></div></div>
-<div class="turn thinking"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>Sudden cramping with loose stools after a meal is most often a stomach bug or food that didn't agree with you.</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Did anything in that dinner seem off?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged, trimmed</span></div><div class="said"><p>I had passed stool 5-6 times till now and I think its because of the raw chicken shawarma I ate in the dinner. I had vomitting after passing the stool</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>That sounds exhausting. Any trouble keeping fluids down or passing urine?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>I am drinking and passing urine comfortably</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Good, that's important. From what you describe, it sounds like cramps that come in waves, low in the belly. Is that close?</p><div class="note">a guess, offered to be checked</div></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>stomach pain is still there, It is in the lower side of my belly and it come in waves and I feel relieved then suddenly the pain comes up</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Waves of cramping low in the belly fit a gut infection. Any fever, chills or blood in the stool?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>I dont have any fever or chills for now. no only yellow liquid stolls</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>So: sharp pain since last night, 5-6 loose stools, vomiting, fluids staying down, no fever. Is there something else I should know, like any regular medicines?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>I am on regular medicines for my borderline cholestrol and uric acid</p></div></div>
+</div><div class="orphans" data-orphans="ep-C"></div><div class="ep-nav"><a href="#episode-B">← Episode B</a><a href="#episode-D">Episode D →</a></div></article><article class="episode" id="ep-D" data-ep="D" data-section="ep-D" hidden><header class="ep-head"><p class="eyebrow">Episode D · <code>b9d47118-1</code></p><h2 data-c="ep-D:82af9597">The greeting, then a long story</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Greeting only, then talkative</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">9 → 8</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">0 of 8</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">Greeting-only opening, a long story, a guess</span></div></div></header><div class="script">
+<div class="turn patient" data-c="ep-D:5e099b8c"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Hiii I am <span class="name" title="A real name, left out">name</span></p></div></div>
+<div class="turn vera" data-c="ep-D:0c58f20a"><div class="who">Vera</div><div class="said"><p>Hi <span class="name" title="A real name, left out">name</span>, lovely to meet you. Tell me what's been going on, however it comes.</p><div class="note">a greeting only: the invitation is the whole reply</div></div></div>
+<div class="turn patient" data-c="ep-D:27f44f5e"><div class="who">Patient <span class="tag real">real</span><span class="detail">his answer to "what's been bothering you"</span></div><div class="said"><p>Recently in the night I had very sharp stomach pain I woke up and feeling heavy urge to pass the poop and there the liquid poop is coming for me</p></div></div>
+<div class="turn vera" data-c="ep-D:27ac4a68"><div class="who">Vera</div><div class="said"><p>That sounds really rough, especially waking up with it. When did it begin?</p></div></div>
+<div class="turn patient" data-c="ep-D:e6fa1f70"><div class="who">Patient <span class="tag real">real</span><span class="detail">trimmed</span></div><div class="said"><p>it began yesternight after my dinner</p></div></div>
+<div class="turn thinking" data-c="ep-D:0c7b814e"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>Sudden cramping with loose stools after a meal is most often a stomach bug or food that didn't agree with you.</p></div></div>
+<div class="turn vera" data-c="ep-D:fb9c23d5"><div class="who">Vera</div><div class="said"><p>Did anything in that dinner seem off?</p></div></div>
+<div class="turn patient" data-c="ep-D:f03e7662"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged, trimmed</span></div><div class="said"><p>I had passed stool 5-6 times till now and I think its because of the raw chicken shawarma I ate in the dinner. I had vomitting after passing the stool</p></div></div>
+<div class="turn vera" data-c="ep-D:13b3e558"><div class="who">Vera</div><div class="said"><p>That sounds exhausting. Any trouble keeping fluids down or passing urine?</p></div></div>
+<div class="turn patient" data-c="ep-D:42b04f5d"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>I am drinking and passing urine comfortably</p></div></div>
+<div class="turn vera" data-c="ep-D:99442f10"><div class="who">Vera</div><div class="said"><p>Good, that's important. From what you describe, it sounds like cramps that come in waves, low in the belly. Is that close?</p><div class="note">a guess, offered to be checked</div></div></div>
+<div class="turn patient" data-c="ep-D:006c11a6"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>stomach pain is still there, It is in the lower side of my belly and it come in waves and I feel relieved then suddenly the pain comes up</p></div></div>
+<div class="turn vera" data-c="ep-D:eb7ad43f"><div class="who">Vera</div><div class="said"><p>Waves of cramping low in the belly fit a gut infection. Any fever, chills or blood in the stool?</p></div></div>
+<div class="turn patient" data-c="ep-D:2a632679"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>I dont have any fever or chills for now. no only yellow liquid stolls</p></div></div>
+<div class="turn vera" data-c="ep-D:17463794"><div class="who">Vera</div><div class="said"><p>So: sharp pain since last night, 5-6 loose stools, vomiting, fluids staying down, no fever. Is there something else I should know, like any regular medicines?</p></div></div>
+<div class="turn patient" data-c="ep-D:51234f85"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>I am on regular medicines for my borderline cholestrol and uric acid</p></div></div>
 <div class="turn assessment"><div class="who"></div><div class="said">Vera gives the assessment</div></div>
-</div><div class="after">A patient with this much to say does not get fewer messages (9 to 8). He gets fewer questions and a conversation that lets him tell it.</div><div class="ep-nav"><a href="#episode-C">← Episode C</a><a href="#episode-E">Episode E →</a></div></article><article class="episode" id="ep-E" data-ep="E" hidden><header class="ep-head"><p class="eyebrow">Episode E · <code>fe2f0f97-1</code></p><h2>Typing for someone else, about something private</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Typing for someone else, shy, joking</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">9 → 6</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">2 of 6</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">Proxy typing, intimate topic</span></div></div></header><div class="script">
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>My wife has missed her period</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Thanks for telling me. Tell me what's been happening, however it comes. If she's nearby, she can add to it too.</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag expected">expected</span><span class="detail">five facts he gave across the real chat</span></div><div class="said"><p>7 days late. Her cycle isn't regular. No tummy pain or bleeding. We were together with no contraception and she hasn't done a test.</p></div></div>
-<div class="turn thinking"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>Thanks for being open about that. A week late, with cycles that vary and the chance of a pregnancy, this most likely points to an early pregnancy or just a delayed period. A home test would settle it.</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Has she had any nausea or felt unusually tired?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>No nausea unsure about other two</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>That's fine. Has anything stressful happened lately?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>yes we had a very big fight but after that we did something good you know what I mean hehehehe</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Ah, I see. Stress can delay a period too. Has she felt dizzy, or had pain on one side?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Slight dizziness fainting no but weakness is there</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Thank you for telling me all of this. Is there something else I should know?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag expected">expected</span></div><div class="said"><p>No.</p></div></div>
+</div><div class="after" data-c="ep-D:711279e9">A patient with this much to say does not get fewer messages (9 to 8). He gets fewer questions and a conversation that lets him tell it.</div><div class="orphans" data-orphans="ep-D"></div><div class="ep-nav"><a href="#episode-C">← Episode C</a><a href="#episode-E">Episode E →</a></div></article><article class="episode" id="ep-E" data-ep="E" data-section="ep-E" hidden><header class="ep-head"><p class="eyebrow">Episode E · <code>fe2f0f97-1</code></p><h2 data-c="ep-E:42e64a3d">Typing for someone else, about something private</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Typing for someone else, shy, joking</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">9 → 6</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">2 of 6</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">Proxy typing, intimate topic</span></div></div></header><div class="script">
+<div class="turn patient" data-c="ep-E:4f3f140e"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>My wife has missed her period</p></div></div>
+<div class="turn vera" data-c="ep-E:bbe36aff"><div class="who">Vera</div><div class="said"><p>Thanks for telling me. Tell me what's been happening, however it comes. If she's nearby, she can add to it too.</p></div></div>
+<div class="turn patient" data-c="ep-E:eae384aa"><div class="who">Patient <span class="tag expected">expected</span><span class="detail">five facts he gave across the real chat</span></div><div class="said"><p>7 days late. Her cycle isn't regular. No tummy pain or bleeding. We were together with no contraception and she hasn't done a test.</p></div></div>
+<div class="turn thinking" data-c="ep-E:33b21cba"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>Thanks for being open about that. A week late, with cycles that vary and the chance of a pregnancy, this most likely points to an early pregnancy or just a delayed period. A home test would settle it.</p></div></div>
+<div class="turn vera" data-c="ep-E:34720a10"><div class="who">Vera</div><div class="said"><p>Has she had any nausea or felt unusually tired?</p></div></div>
+<div class="turn patient" data-c="ep-E:141747a6"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>No nausea unsure about other two</p></div></div>
+<div class="turn vera" data-c="ep-E:350786b6"><div class="who">Vera</div><div class="said"><p>That's fine. Has anything stressful happened lately?</p></div></div>
+<div class="turn patient" data-c="ep-E:46a90c60"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>yes we had a very big fight but after that we did something good you know what I mean hehehehe</p></div></div>
+<div class="turn vera" data-c="ep-E:851bc831"><div class="who">Vera</div><div class="said"><p>Ah, I see. Stress can delay a period too. Has she felt dizzy, or had pain on one side?</p></div></div>
+<div class="turn patient" data-c="ep-E:867a30eb"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Slight dizziness fainting no but weakness is there</p></div></div>
+<div class="turn vera" data-c="ep-E:0088cb8f"><div class="who">Vera</div><div class="said"><p>Thank you for telling me all of this. Is there something else I should know?</p></div></div>
+<div class="turn patient" data-c="ep-E:3e900e0d"><div class="who">Patient <span class="tag expected">expected</span></div><div class="said"><p>No.</p></div></div>
 <div class="turn assessment"><div class="who"></div><div class="said">Vera gives the assessment</div></div>
-</div><div class="ep-nav"><a href="#episode-D">← Episode D</a><a href="#episode-F">Episode F →</a></div></article><article class="episode" id="ep-F" data-ep="F" hidden><header class="ep-head"><p class="eyebrow">Episode F · <code>c0235ec7-1</code></p><h2>The terse parent</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Terse parent</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">9 → 7</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">1 of 7</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">No repeated questions, a guess</span></div></div></header><div class="script">
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>my son is drooling a lot</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Oh, that must be worrying. Tell me what you've noticed with him, however it comes.</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag expected">expected</span><span class="detail">compresses five short real answers</span></div><div class="said"><p>He's 1 year old. Drooling since yesterday. A bit fussy. No fever, no trouble breathing or swallowing, no swollen gums.</p></div></div>
-<div class="turn thinking"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>At his age, drooling and fussiness are often teething or a small mouth infection. Let me check one thing.</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Can you look inside his mouth: do you see any sores or spots?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>i can see some sores</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Thanks for looking. Is he still drinking his milk and wetting his nappy as usual?</p><div class="note">a hydration check for a toddler: one red-flag set, see decision 1</div></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>yes yes</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>That's reassuring. Any spots anywhere else, like his hands, feet, knees or nappy area?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>on his knees</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Spots on his knees, thanks. Are they like small pimples?</p><div class="note">a guess, offered to be checked</div></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>like pimples</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>So: drooling since yesterday, a bit fussy, sores in his mouth, pimple-like spots on his knees, drinking normally. Is there something else I should know, like other children around him?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>he plays with toddlers.. nothing else</p></div></div>
+</div><div class="orphans" data-orphans="ep-E"></div><div class="ep-nav"><a href="#episode-D">← Episode D</a><a href="#episode-F">Episode F →</a></div></article><article class="episode" id="ep-F" data-ep="F" data-section="ep-F" hidden><header class="ep-head"><p class="eyebrow">Episode F · <code>c0235ec7-1</code></p><h2 data-c="ep-F:2f63536c">The terse parent</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Terse parent</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">9 → 7</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">1 of 7</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">No repeated questions, a guess</span></div></div></header><div class="script">
+<div class="turn patient" data-c="ep-F:4f92eda0"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>my son is drooling a lot</p></div></div>
+<div class="turn vera" data-c="ep-F:17cd843f"><div class="who">Vera</div><div class="said"><p>Oh, that must be worrying. Tell me what you've noticed with him, however it comes.</p></div></div>
+<div class="turn patient" data-c="ep-F:eab33234"><div class="who">Patient <span class="tag expected">expected</span><span class="detail">compresses five short real answers</span></div><div class="said"><p>He's 1 year old. Drooling since yesterday. A bit fussy. No fever, no trouble breathing or swallowing, no swollen gums.</p></div></div>
+<div class="turn thinking" data-c="ep-F:39ca761e"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>At his age, drooling and fussiness are often teething or a small mouth infection. Let me check one thing.</p></div></div>
+<div class="turn vera" data-c="ep-F:c89f766b"><div class="who">Vera</div><div class="said"><p>Can you look inside his mouth: do you see any sores or spots?</p></div></div>
+<div class="turn patient" data-c="ep-F:d8c90508"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>i can see some sores</p></div></div>
+<div class="turn vera" data-c="ep-F:9f0a8667"><div class="who">Vera</div><div class="said"><p>Thanks for looking. Is he still drinking his milk and wetting his nappy as usual?</p><div class="note">a hydration check for a toddler: one red-flag set, see decision 1</div></div></div>
+<div class="turn patient" data-c="ep-F:62bc6b3f"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>yes yes</p></div></div>
+<div class="turn vera" data-c="ep-F:a2b5d22d"><div class="who">Vera</div><div class="said"><p>That's reassuring. Any spots anywhere else, like his hands, feet, knees or nappy area?</p></div></div>
+<div class="turn patient" data-c="ep-F:e6e99281"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>on his knees</p></div></div>
+<div class="turn vera" data-c="ep-F:d1486e09"><div class="who">Vera</div><div class="said"><p>Spots on his knees, thanks. Are they like small pimples?</p><div class="note">a guess, offered to be checked</div></div></div>
+<div class="turn patient" data-c="ep-F:58717d37"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>like pimples</p></div></div>
+<div class="turn vera" data-c="ep-F:02a5a0f2"><div class="who">Vera</div><div class="said"><p>So: drooling since yesterday, a bit fussy, sores in his mouth, pimple-like spots on his knees, drinking normally. Is there something else I should know, like other children around him?</p></div></div>
+<div class="turn patient" data-c="ep-F:e8a6d0d0"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>he plays with toddlers.. nothing else</p></div></div>
 <div class="turn assessment"><div class="who"></div><div class="said">Vera gives the assessment</div></div>
-</div><div class="after">The real chat asked about palms, soles and the creche twice. Here each is asked once.</div><div class="ep-nav"><a href="#episode-E">← Episode E</a><a href="#episode-G">Episode G →</a></div></article><article class="episode" id="ep-G" data-ep="G" hidden><header class="ep-head"><p class="eyebrow">Episode G · <code>3baf38b5-1</code></p><h2>A long chat, shortened</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Moderate, many red-flag checks</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">13 → 10</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">1 of 10</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">A long chat, shortened</span></div></div></header><div class="script">
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>You know my gums are feeling swollen and when I eat at that side it pains a lot</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>That sounds uncomfortable, especially when you chew. Where exactly in your mouth is it: upper or lower, back or front, left or right?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Lower back left side</p></div></div>
-<div class="turn thinking"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>A swollen gum at the lower back often means a wisdom tooth coming through, or an irritated gum around it.</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Can you feel a tooth there, with the gum partly over it?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>when i feel it yes</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Any fever with it?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Mild feverish not checked</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Can you open your mouth fully?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Yes I can but after 75% it hurts</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Any pus, bad taste or trouble swallowing?</p><div class="note">signs that an infection is spreading: one red-flag set, see decision 1</div></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>No. Not to swallow but problem in chewing</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Can you see or feel swelling on your cheek or jaw, or spreading towards the neck?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>yes. no</p><div class="note">yes to the swelling on the cheek or jaw, no to spreading towards the neck</div></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>How many days has this been going on?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>3-4 days</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Has anything you tried made it better or worse?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span><span class="detail">merged</span></div><div class="said"><p>No painkillers but took warm water and gargled with salt warm water. no</p><div class="note">the last "no" answered "is it getting worse?" in the real chat</div></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>So: swollen gum at the lower back left for 3-4 days, hurts when chewing, a mild feverish feeling, swelling on the cheek, not spreading. Is there something else I should know?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag expected">expected</span></div><div class="said"><p>No.</p></div></div>
+</div><div class="after" data-c="ep-F:16dd14a1">The real chat asked about palms, soles and the creche twice. Here each is asked once.</div><div class="orphans" data-orphans="ep-F"></div><div class="ep-nav"><a href="#episode-E">← Episode E</a><a href="#episode-G">Episode G →</a></div></article><article class="episode" id="ep-G" data-ep="G" data-section="ep-G" hidden><header class="ep-head"><p class="eyebrow">Episode G · <code>3baf38b5-1</code></p><h2 data-c="ep-G:9f6301f9">A long chat, shortened</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Moderate, many red-flag checks</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">13 → 10</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">1 of 10</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">A long chat, shortened</span></div></div></header><div class="script">
+<div class="turn patient" data-c="ep-G:3db68bce"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>You know my gums are feeling swollen and when I eat at that side it pains a lot</p></div></div>
+<div class="turn vera" data-c="ep-G:f8d871cd"><div class="who">Vera</div><div class="said"><p>That sounds uncomfortable, especially when you chew. Where exactly in your mouth is it: upper or lower, back or front, left or right?</p></div></div>
+<div class="turn patient" data-c="ep-G:f290569c"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Lower back left side</p></div></div>
+<div class="turn thinking" data-c="ep-G:62d75332"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>A swollen gum at the lower back often means a wisdom tooth coming through, or an irritated gum around it.</p></div></div>
+<div class="turn vera" data-c="ep-G:04ebdb43"><div class="who">Vera</div><div class="said"><p>Can you feel a tooth there, with the gum partly over it?</p></div></div>
+<div class="turn patient" data-c="ep-G:f66f7ff1"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>when i feel it yes</p></div></div>
+<div class="turn vera" data-c="ep-G:44a09b79"><div class="who">Vera</div><div class="said"><p>Any fever with it?</p></div></div>
+<div class="turn patient" data-c="ep-G:d73ebcfd"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Mild feverish not checked</p></div></div>
+<div class="turn vera" data-c="ep-G:d2d1fa24"><div class="who">Vera</div><div class="said"><p>Can you open your mouth fully?</p></div></div>
+<div class="turn patient" data-c="ep-G:5ecfda22"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Yes I can but after 75% it hurts</p></div></div>
+<div class="turn vera" data-c="ep-G:2099cae4"><div class="who">Vera</div><div class="said"><p>Any pus, bad taste or trouble swallowing?</p><div class="note">signs that an infection is spreading: one red-flag set, see decision 1</div></div></div>
+<div class="turn patient" data-c="ep-G:9569702b"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>No. Not to swallow but problem in chewing</p></div></div>
+<div class="turn vera" data-c="ep-G:622eacdd"><div class="who">Vera</div><div class="said"><p>Can you see or feel swelling on your cheek or jaw, or spreading towards the neck?</p></div></div>
+<div class="turn patient" data-c="ep-G:524a1298"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>yes. no</p><div class="note">yes to the swelling on the cheek or jaw, no to spreading towards the neck</div></div></div>
+<div class="turn vera" data-c="ep-G:94a7b985"><div class="who">Vera</div><div class="said"><p>How many days has this been going on?</p></div></div>
+<div class="turn patient" data-c="ep-G:f1b97652"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>3-4 days</p></div></div>
+<div class="turn vera" data-c="ep-G:a03a3fc4"><div class="who">Vera</div><div class="said"><p>Has anything you tried made it better or worse?</p></div></div>
+<div class="turn patient" data-c="ep-G:11746ed3"><div class="who">Patient <span class="tag real">real</span><span class="detail">merged</span></div><div class="said"><p>No painkillers but took warm water and gargled with salt warm water. no</p><div class="note">the last "no" answered "is it getting worse?" in the real chat</div></div></div>
+<div class="turn vera" data-c="ep-G:6a17b366"><div class="who">Vera</div><div class="said"><p>So: swollen gum at the lower back left for 3-4 days, hurts when chewing, a mild feverish feeling, swelling on the cheek, not spreading. Is there something else I should know?</p></div></div>
+<div class="turn patient" data-c="ep-G:202c71c9"><div class="who">Patient <span class="tag expected">expected</span></div><div class="said"><p>No.</p></div></div>
 <div class="turn assessment"><div class="who"></div><div class="said">Vera gives the assessment</div></div>
-</div><div class="ep-nav"><a href="#episode-F">← Episode F</a><a href="#episode-H">Episode H →</a></div></article><article class="episode" id="ep-H" data-ep="H" hidden><header class="ep-head"><p class="eyebrow">Episode H · <code>c0235ec7-2</code></p><h2>The patient who gives a comparison</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Expressive, uses a comparison</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">13 → 10</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">0 of 10</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">Taking the patient's own picture seriously</span></div></div></header><div class="script">
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>you know how ears feel when there is pressure change in airplanes. I have been feeling that while doing simple movements at home.</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>That aeroplane-ear feeling, even with simple movements at home, sounds really unsettling. Which ear is it in?</p><div class="note">the patient has already said how it feels, in a picture, so no invitation and no push</div></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>both</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Both ears. Does it happen with certain movements, like turning your head or getting up?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>I can't pin point, i think all of them but intermittently</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Coming and going like that is useful to know. Have you had a cold or a blocked nose lately?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>yeah, a bit of cold</p></div></div>
-<div class="turn thinking"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>That fits. A cold can block the little tubes that balance pressure in the ears, which gives exactly that aeroplane feeling. Let me check a few more things.</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Does the room ever spin?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>no.. just very weird, also there is a pulsing sound where the sound of the surrounding become low and then normal rapidly</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>A pulse that makes everything go quiet and come back. Does it keep time with your heartbeat?</p><div class="note">a guess, offered to be checked</div></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>yup</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Thanks, that helps. Any ear pain, discharge or trouble hearing?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>no. no</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Any weakness, numbness or trouble speaking when it happens?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>no</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Have you flown or dived recently?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>no</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>So: both ears, an aeroplane-type fullness with movement, a mild cold, a pulse in time with your heartbeat, nothing worrying with it. Is there something else I should know, like any medicine you've taken?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>not really, cold isnt that bad</p></div></div>
+</div><div class="orphans" data-orphans="ep-G"></div><div class="ep-nav"><a href="#episode-F">← Episode F</a><a href="#episode-H">Episode H →</a></div></article><article class="episode" id="ep-H" data-ep="H" data-section="ep-H" hidden><header class="ep-head"><p class="eyebrow">Episode H · <code>c0235ec7-2</code></p><h2 data-c="ep-H:c0466d1e">The patient who gives a comparison</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Expressive, uses a comparison</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">13 → 10</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">0 of 10</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">Taking the patient's own picture seriously</span></div></div></header><div class="script">
+<div class="turn patient" data-c="ep-H:7879b1da"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>you know how ears feel when there is pressure change in airplanes. I have been feeling that while doing simple movements at home.</p></div></div>
+<div class="turn vera" data-c="ep-H:b7fb3fbf"><div class="who">Vera</div><div class="said"><p>That aeroplane-ear feeling, even with simple movements at home, sounds really unsettling. Which ear is it in?</p><div class="note">the patient has already said how it feels, in a picture, so no invitation and no push</div></div></div>
+<div class="turn patient" data-c="ep-H:2a262ab7"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>both</p></div></div>
+<div class="turn vera" data-c="ep-H:137912cc"><div class="who">Vera</div><div class="said"><p>Both ears. Does it happen with certain movements, like turning your head or getting up?</p></div></div>
+<div class="turn patient" data-c="ep-H:7228ae15"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>I can't pin point, i think all of them but intermittently</p></div></div>
+<div class="turn vera" data-c="ep-H:7a8f10fe"><div class="who">Vera</div><div class="said"><p>Coming and going like that is useful to know. Have you had a cold or a blocked nose lately?</p></div></div>
+<div class="turn patient" data-c="ep-H:9c779d15"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>yeah, a bit of cold</p></div></div>
+<div class="turn thinking" data-c="ep-H:c0bbf7c2"><div class="who">Vera <span class="tag thinking">what I'm thinking</span></div><div class="said"><p>That fits. A cold can block the little tubes that balance pressure in the ears, which gives exactly that aeroplane feeling. Let me check a few more things.</p></div></div>
+<div class="turn vera" data-c="ep-H:2c29f5db"><div class="who">Vera</div><div class="said"><p>Does the room ever spin?</p></div></div>
+<div class="turn patient" data-c="ep-H:cbb42751"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>no.. just very weird, also there is a pulsing sound where the sound of the surrounding become low and then normal rapidly</p></div></div>
+<div class="turn vera" data-c="ep-H:967a680f"><div class="who">Vera</div><div class="said"><p>A pulse that makes everything go quiet and come back. Does it keep time with your heartbeat?</p><div class="note">a guess, offered to be checked</div></div></div>
+<div class="turn patient" data-c="ep-H:3d68001f"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>yup</p></div></div>
+<div class="turn vera" data-c="ep-H:18bb0266"><div class="who">Vera</div><div class="said"><p>Thanks, that helps. Any ear pain, discharge or trouble hearing?</p></div></div>
+<div class="turn patient" data-c="ep-H:2b35d632"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>no. no</p></div></div>
+<div class="turn vera" data-c="ep-H:a4edefcb"><div class="who">Vera</div><div class="said"><p>Any weakness, numbness or trouble speaking when it happens?</p></div></div>
+<div class="turn patient" data-c="ep-H:91148711"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>no</p></div></div>
+<div class="turn vera" data-c="ep-H:d20076f0"><div class="who">Vera</div><div class="said"><p>Have you flown or dived recently?</p></div></div>
+<div class="turn patient" data-c="ep-H:91148711:1"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>no</p></div></div>
+<div class="turn vera" data-c="ep-H:c3d7f41a"><div class="who">Vera</div><div class="said"><p>So: both ears, an aeroplane-type fullness with movement, a mild cold, a pulse in time with your heartbeat, nothing worrying with it. Is there something else I should know, like any medicine you've taken?</p></div></div>
+<div class="turn patient" data-c="ep-H:d180a6a6"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>not really, cold isnt that bad</p></div></div>
 <div class="turn assessment"><div class="who"></div><div class="said">Vera gives the assessment</div></div>
-</div><div class="ep-nav"><a href="#episode-G">← Episode G</a><a href="#episode-K">Episode K →</a></div></article><article class="episode" id="ep-K" data-ep="K" hidden><header class="ep-head"><p class="eyebrow">Episode K · <code>203e8102-8</code></p><h2>Warm on the way to an emergency</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Worried family member</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">6 → 5</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">0 of 5</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">Warmth on the way to an emergency</span></div></div></header><div class="script">
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p><span class="name" title="A real name, left out">name</span> is having fever since today morning 100F</p><div class="note">a 70-year-old with BP, sugar and thyroid in the profile</div></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>I'm sorry he isn't well. At 70, with his BP, sugar and thyroid, a fever needs care. Tell me what else you've noticed with it, however it comes.</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>He is having cough, he is also drooling slightly and throws sputum away after coughing</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Cough with phlegm and a fever since morning, and the drooling worries me a little. Is he having trouble swallowing?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Yes there is trouble</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Thank you for telling me. To rule out a stroke: any drooping on one side of his face, or slurred speech?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>No. But he is having issue speaking due to cough</p></div></div>
-<div class="turn vera"><div class="who">Vera</div><div class="said"><p>Is he short of breath, even sitting still?</p></div></div>
-<div class="turn patient"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Yes slightly</p></div></div>
-<div class="turn emergency"><div class="who">Vera <span class="tag emergency">emergency message</span><span class="detail">unchanged from the real chat</span></div><div class="said"><p>Breathlessness even at rest, with trouble swallowing, drooling and fever at his age, needs to be seen right now. Please call 112 (108 for an ambulance) or take him to the nearest emergency room immediately. Keep him sitting upright, stay with him, and give no food, drink or medicine unless the emergency service says so.</p></div></div>
-</div><div class="after">The emergency message itself is not changed. What improves is the way there: a reason with each question, and one question for the two stroke signs.</div><div class="ep-nav"><a href="#episode-H">← Episode H</a><span></span></div></article>
-        <details class="howto"><summary>How these were rebuilt, and all nine at a glance</summary><p><strong>How to read these.</strong> Patient lines marked <strong>(real)</strong> are the patient's actual words from that chat (some trimmed or merged, said so each time). Lines marked <strong>(expected)</strong> are built only from facts this patient gave elsewhere in the same real chat; a real patient may answer differently, which is what the next step will find out. No fact is invented. Names are left out: <span class="name" title="A real name, left out">name</span> stands for a real name. "Vera — what I'm thinking" is one extra message that appears once, just before Vera's next question.</p>
-<p><strong>Read the "ideal" counts as the best case.</strong> Every real line was a real answer to a <em>different</em> question, so the patient might need one more message to say the same thing. The expected lines (one compresses five real answers) are the least proven.</p><div class="table"><table><thead><tr><th></th><th>Case</th><th>Patient type</th><th>Original → ideal patient messages</th><th>Lines that are "expected", not real</th><th>What it shows</th></tr></thead><tbody><tr><td>A</td><td>Not passed stool for 3 days (<a class="ep" href="#episode-A" title="Open episode A">2e103fa2-1</a>)</td><td>Writes 1-2 words</td><td>9 → 6</td><td>3 of 6</td><td>Invitation, one push, check-back</td></tr><tr><td>B</td><td>Child with pain in the buttock (<a class="ep" href="#episode-B" title="Open episode B">203e8102-9</a>)</td><td>Shy, types for a child</td><td>8 → 6</td><td>2 of 6</td><td>Normalising, a plain-words place</td></tr><tr><td>C</td><td>Gud gudi in the stomach (<a class="ep" href="#episode-C" title="Open episode C">39ae9855-1</a>)</td><td>Hinglish, voices a fear</td><td>9 → 6</td><td>0 of 6</td><td>Hinglish, a guess, answering a fear</td></tr><tr><td>D</td><td>Sudden stomach pain after a shawarma (<a class="ep" href="#episode-D" title="Open episode D">b9d47118-1</a>)</td><td>Greeting only, then talkative</td><td>9 → 8</td><td>0 of 8</td><td>Greeting-only opening, a long story, a guess</td></tr><tr><td>E</td><td>Wife's period is late (<a class="ep" href="#episode-E" title="Open episode E">fe2f0f97-1</a>)</td><td>Typing for someone else, shy, joking</td><td>9 → 6</td><td>2 of 6</td><td>Proxy typing, intimate topic</td></tr><tr><td>F</td><td>One-year-old drooling (<a class="ep" href="#episode-F" title="Open episode F">c0235ec7-1</a>)</td><td>Terse parent</td><td>9 → 7</td><td>1 of 7</td><td>No repeated questions, a guess</td></tr><tr><td>G</td><td>Swollen gum at the back (<a class="ep" href="#episode-G" title="Open episode G">3baf38b5-1</a>)</td><td>Moderate, many red-flag checks</td><td>13 → 10</td><td>1 of 10</td><td>A long chat, shortened</td></tr><tr><td>H</td><td>Ears feel like in an aeroplane (<a class="ep" href="#episode-H" title="Open episode H">c0235ec7-2</a>)</td><td>Expressive, uses a comparison</td><td>13 → 10</td><td>0 of 10</td><td>Taking the patient's own picture seriously</td></tr><tr><td>K</td><td>Grandfather with fever and trouble swallowing (<a class="ep" href="#episode-K" title="Open episode K">203e8102-8</a>)</td><td>Worried family member</td><td>6 → 5</td><td>0 of 5</td><td>Warmth on the way to an emergency</td></tr></tbody></table></div></details>
+</div><div class="orphans" data-orphans="ep-H"></div><div class="ep-nav"><a href="#episode-G">← Episode G</a><a href="#episode-K">Episode K →</a></div></article><article class="episode" id="ep-K" data-ep="K" data-section="ep-K" hidden><header class="ep-head"><p class="eyebrow">Episode K · <code>203e8102-8</code></p><h2 data-c="ep-K:fa4c9ef4">Warm on the way to an emergency</h2><div class="facts"><div class="fact"><span class="fact-k">Patient type</span><span class="fact-v">Worried family member</span></div><div class="fact"><span class="fact-k">Patient messages, real → ideal</span><span class="fact-v">6 → 5</span></div><div class="fact"><span class="fact-k">Lines that are expected, not real</span><span class="fact-v">0 of 5</span></div><div class="fact"><span class="fact-k">What it shows</span><span class="fact-v">Warmth on the way to an emergency</span></div></div></header><div class="script">
+<div class="turn patient" data-c="ep-K:e2542964"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p><span class="name" title="A real name, left out">name</span> is having fever since today morning 100F</p><div class="note">a 70-year-old with BP, sugar and thyroid in the profile</div></div></div>
+<div class="turn vera" data-c="ep-K:a5644e73"><div class="who">Vera</div><div class="said"><p>I'm sorry he isn't well. At 70, with his BP, sugar and thyroid, a fever needs care. Tell me what else you've noticed with it, however it comes.</p></div></div>
+<div class="turn patient" data-c="ep-K:4191f71a"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>He is having cough, he is also drooling slightly and throws sputum away after coughing</p></div></div>
+<div class="turn vera" data-c="ep-K:51ca863c"><div class="who">Vera</div><div class="said"><p>Cough with phlegm and a fever since morning, and the drooling worries me a little. Is he having trouble swallowing?</p></div></div>
+<div class="turn patient" data-c="ep-K:206cc911"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Yes there is trouble</p></div></div>
+<div class="turn vera" data-c="ep-K:9882ecc9"><div class="who">Vera</div><div class="said"><p>Thank you for telling me. To rule out a stroke: any drooping on one side of his face, or slurred speech?</p></div></div>
+<div class="turn patient" data-c="ep-K:5ae797f8"><div class="who">Patient <span class="tag real">real</span><span class="detail">two replies merged</span></div><div class="said"><p>No. But he is having issue speaking due to cough</p></div></div>
+<div class="turn vera" data-c="ep-K:4162e9fb"><div class="who">Vera</div><div class="said"><p>Is he short of breath, even sitting still?</p></div></div>
+<div class="turn patient" data-c="ep-K:f99e478e"><div class="who">Patient <span class="tag real">real</span></div><div class="said"><p>Yes slightly</p></div></div>
+<div class="turn emergency" data-c="ep-K:36edeac7"><div class="who">Vera <span class="tag emergency">emergency message</span><span class="detail">unchanged from the real chat</span></div><div class="said"><p>Breathlessness even at rest, with trouble swallowing, drooling and fever at his age, needs to be seen right now. Please call 112 (108 for an ambulance) or take him to the nearest emergency room immediately. Keep him sitting upright, stay with him, and give no food, drink or medicine unless the emergency service says so.</p></div></div>
+</div><div class="after" data-c="ep-K:08940053">The emergency message itself is not changed. What improves is the way there: a reason with each question, and one question for the two stroke signs.</div><div class="orphans" data-orphans="ep-K"></div><div class="ep-nav"><a href="#episode-H">← Episode H</a><span></span></div></article>
+        <details class="howto"><summary>How these were rebuilt, and all nine at a glance</summary><p data-c="episodes:fc00b905"><strong>How to read these.</strong> Patient lines marked <strong>(real)</strong> are the patient's actual words from that chat (some trimmed or merged, said so each time). Lines marked <strong>(expected)</strong> are built only from facts this patient gave elsewhere in the same real chat; a real patient may answer differently, which is what the next step will find out. No fact is invented. Names are left out: <span class="name" title="A real name, left out">name</span> stands for a real name. "Vera — what I'm thinking" is one extra message that appears once, just before Vera's next question.</p>
+<p data-c="episodes:f60afeb9"><strong>Read the "ideal" counts as the best case.</strong> Every real line was a real answer to a <em>different</em> question, so the patient might need one more message to say the same thing. The expected lines (one compresses five real answers) are the least proven.</p><div class="table"><table><thead><tr><th></th><th>Case</th><th>Patient type</th><th>Original → ideal patient messages</th><th>Lines that are "expected", not real</th><th>What it shows</th></tr></thead><tbody><tr data-c="episodes:378cbd62"><td>A</td><td>Not passed stool for 3 days (<a class="ep" href="#episode-A" title="Open episode A">2e103fa2-1</a>)</td><td>Writes 1-2 words</td><td>9 → 6</td><td>3 of 6</td><td>Invitation, one push, check-back</td></tr><tr data-c="episodes:5fa8c62c"><td>B</td><td>Child with pain in the buttock (<a class="ep" href="#episode-B" title="Open episode B">203e8102-9</a>)</td><td>Shy, types for a child</td><td>8 → 6</td><td>2 of 6</td><td>Normalising, a plain-words place</td></tr><tr data-c="episodes:a4238a48"><td>C</td><td>Gud gudi in the stomach (<a class="ep" href="#episode-C" title="Open episode C">39ae9855-1</a>)</td><td>Hinglish, voices a fear</td><td>9 → 6</td><td>0 of 6</td><td>Hinglish, a guess, answering a fear</td></tr><tr data-c="episodes:73bef2e5"><td>D</td><td>Sudden stomach pain after a shawarma (<a class="ep" href="#episode-D" title="Open episode D">b9d47118-1</a>)</td><td>Greeting only, then talkative</td><td>9 → 8</td><td>0 of 8</td><td>Greeting-only opening, a long story, a guess</td></tr><tr data-c="episodes:feb1fc62"><td>E</td><td>Wife's period is late (<a class="ep" href="#episode-E" title="Open episode E">fe2f0f97-1</a>)</td><td>Typing for someone else, shy, joking</td><td>9 → 6</td><td>2 of 6</td><td>Proxy typing, intimate topic</td></tr><tr data-c="episodes:8455775f"><td>F</td><td>One-year-old drooling (<a class="ep" href="#episode-F" title="Open episode F">c0235ec7-1</a>)</td><td>Terse parent</td><td>9 → 7</td><td>1 of 7</td><td>No repeated questions, a guess</td></tr><tr data-c="episodes:26900ef2"><td>G</td><td>Swollen gum at the back (<a class="ep" href="#episode-G" title="Open episode G">3baf38b5-1</a>)</td><td>Moderate, many red-flag checks</td><td>13 → 10</td><td>1 of 10</td><td>A long chat, shortened</td></tr><tr data-c="episodes:f21fa494"><td>H</td><td>Ears feel like in an aeroplane (<a class="ep" href="#episode-H" title="Open episode H">c0235ec7-2</a>)</td><td>Expressive, uses a comparison</td><td>13 → 10</td><td>0 of 10</td><td>Taking the patient's own picture seriously</td></tr><tr data-c="episodes:72a147ed"><td>K</td><td>Grandfather with fever and trouble swallowing (<a class="ep" href="#episode-K" title="Open episode K">203e8102-8</a>)</td><td>Worried family member</td><td>6 → 5</td><td>0 of 5</td><td>Warmth on the way to an emergency</td></tr></tbody></table></div></details>
+        <div class="orphans" data-orphans="episodes"></div>
       </div>
     </div>
   </div>
-  <div class="panel" data-panel="findings" hidden><section class="doc-sec"><h2>What the 34 chats show</h2><h3>What breaks the "talking to a doctor" feel</h3>
-<div class="table"><table><thead><tr><th>#</th><th>What happens</th><th>Evidence</th></tr></thead><tbody><tr><td>1</td><td><strong>It is a quiz.</strong> Over half the questions are yes/no, a third are lists of options inside the sentence, 1 in 20 is open. A third of all patient answers are a plain "no".</td><td>90 yes/no, 54 lists, 8 open of 172. 56 answers start with "no". Median answer 4 words; 41% are 3 words or fewer.</td></tr><tr><td>2</td><td><strong>The same opener on every turn.</strong> "Okay… / Achha… / Oh…" then an echo of the answer. The echo adds nothing ("Okay, no vomiting, that's a relief.").</td><td>165 of 172 replies start this way.</td></tr><tr><td>3</td><td><strong>Several questions in one.</strong> Some are then "fixed" in front of the patient.</td><td>8 replies with 2+ question marks, 27 with "and/or" in the question, 4 visible self-corrections ("Actually, let me ask it simply…").</td></tr><tr><td>4</td><td><strong>The same thing asked twice.</strong></td><td><a class="ep" href="#episode-F" title="Open episode F">c0235ec7-1</a>: palms and soles asked in turn 14, again in 16; creche asked in 12, again in 16. The patient answers "nothing else". <code>3baf38b5-2</code>: "has the jaw swelling got bigger since yesterday?" then "is that swelling bigger than yesterday?".</td></tr><tr><td>5</td><td><strong>A list of places with no way out pushed a wrong answer.</strong> The patient picked "middle of the buttock"; three questions later the truth came out: "No it is inside anus". The patient was too shy to say it first.</td><td><a class="ep" href="#episode-B" title="Open episode B">203e8102-9</a></td></tr><tr><td>6</td><td><strong>An open location question confused.</strong> "Where in your belly does it hurt?" got "What do you mean". Naming a few places in the sentence worked straight after ("Lower").</td><td><a class="ep" href="#episode-A" title="Open episode A">2e103fa2-1</a></td></tr><tr><td>7</td><td><strong>A reply with no question ended the chat.</strong> Two replies in a row had no question; the chat stops there.</td><td><code>c92b074b-1</code></td></tr><tr><td>8</td><td><strong>System words leaked.</strong> "Your family file doesn't list a son…" And a name the patient never typed: "<span class="name" title="A real name, left out">name</span>, did I say his name to you?"</td><td><code>203e8102-1</code>, <code>fd743e41-1</code>, <code>203e8102-3</code></td></tr><tr><td>9</td><td><strong>Questions the typist can't answer.</strong> A husband asked about his wife's last cycle: "Ummm umm I dont know".</td><td><code>0debe088-1</code></td></tr><tr><td>10</td><td><strong>The cap decides.</strong> 11 of 21 finished chats stopped at exactly 8 questions, and 9 of those 11 were below the confidence needed to stop.</td><td><code>question_analysis.md</code> section 5</td></tr><tr><td>11</td><td><strong>An unclear answer became a 112 message.</strong> "He is crying to drink or eat" (<code>203e8102-1</code>) and "I guess no" to passing urine (<code>203e8102-5</code>) both triggered the emergency message. In <code>-5</code> the patient corrected themselves two messages later: "ohh sorry he had the waters I missed that part" (<code>-7</code>). Only an observation: emergencies are not part of this draft.</td><td><code>203e8102-1</code>, <code>-5</code>, <code>-7</code></td></tr></tbody></table></div>
-<h3>What already works (keep and do more of)</h3>
-<ul><li><strong>A reaction that carries information.</strong> The best turns tell the patient why the next question matters:<ul><li>"That timing after the shawarma does make food upset a real possibility." (<a class="ep" href="#episode-D" title="Open episode D">b9d47118-1</a>)</li><li>"Sores in the mouth with drooling and fussiness often point to a viral infection of the mouth." (<a class="ep" href="#episode-F" title="Open episode F">c0235ec7-1</a>)</li><li>"Waves of cramping low in the belly fit with a gut infection." (<a class="ep" href="#episode-D" title="Open episode D">b9d47118-1</a>)</li></ul>
-<p>The model already does a small version of "thinking aloud", even though the prompt forbids it.</p></li><li><strong>Hearing a fear and answering it in a few words.</strong> "ye dar hona natural hai" (<a class="ep" href="#episode-C" title="Open episode C">39ae9855-1</a>). "That's okay, a lot of people don't keep track" (<code>0debe088-1</code>). "Thanks for being open about that" (<a class="ep" href="#episode-E" title="Open episode E">fe2f0f97-1</a>).</li><li><strong>Mirroring the language.</strong> In <a class="ep" href="#episode-C" title="Open episode C">39ae9855-1</a> Vera spoke Hinglish and the patient wrote Hinglish.</li><li><strong>A question that invites the patient's own words</strong> got the longest answer in all 34 chats (49 words): "By 'motion not fresh', do you mean loose watery stools?" (<code>3f64258e-1</code>). Also "Ye gud gudi feeling kab se ho rahi hai?" (17 words, with the cause and a worry).</li><li><strong>The patient matters as much as the question.</strong> The 12 longest answers come from 6 accounts, 4 of them from one. Short answers are partly a style, so the design has to work for both styles.</li></ul>
-<h3>Moments where the patient showed a feeling</h3>
-<div class="table"><table><thead><tr><th>Cue</th><th>What the patient wrote</th><th>What the chat did</th></tr></thead><tbody><tr><td>fear</td><td>"lag raha mujhe dar hai pet na kharap ho abhi recently O2 khaya tha"</td><td>Answered it in 5 words, then moved on without asking what happened.</td></tr><tr><td>shyness</td><td>"we had some good times together so you figure it out", "you know what I mean hehehe"</td><td>Thanked them for being open. Good.</td></tr><tr><td>shyness (body)</td><td>said "buttocks" for a problem inside the anus</td><td>Not noticed; three questions wasted.</td></tr><tr><td>confusion</td><td>"What do you mean"</td><td>Rephrased with examples. Good.</td></tr><tr><td>not knowing</td><td>"Ummm umm I dont know"</td><td>Said it was normal. Good.</td></tr><tr><td>impatience</td><td>"he plays with toddlers.. nothing else"</td><td>The question had just been asked twice. Not noticed.</td></tr><tr><td>surprise at being known</td><td>"<span class="name" title="A real name, left out">name</span>, did I say his name to you?"</td><td>Apologised. The leak should not happen.</td></tr></tbody></table></div></section></div><div class="panel" data-panel="shape" hidden><section class="doc-sec"><h2>How we want the patient to feel when it ends</h2><div class="table"><table><thead><tr><th>The patient should feel</th><th>What makes that happen</th></tr></thead><tbody><tr><td><strong>Welcome</strong>, no form to fill in</td><td>An open invitation first. No list of questions.</td></tr><tr><td><strong>Heard</strong>, never repeating themselves</td><td>Uses their own words. Never asks twice. Never asks what the profile already says.</td></tr><tr><td><strong>Understood</strong>, "she gets what it's like"</td><td>One accurate line about the experience, not a guess at their mood. If the cue is a fear, answer the fear.</td></tr><tr><td><strong>Guided</strong>, not interrogated</td><td>A short reason now and then ("so I can tell a tummy bug from…"). One "what I'm thinking" message.</td></tr><tr><td><strong>Safe to say the awkward thing</strong></td><td>A normalising half-sentence before a private question. Accept euphemisms. Never demand the exact word.</td></tr><tr><td><strong>Unhurried but moving</strong></td><td>About 5 to 6 patient messages for a simple complaint, up to 9 or 10 for a complicated one. Never the same question twice.</td></tr></tbody></table></div></section><section class="doc-sec"><h2>The shape of an ideal chat</h2><pre>T1  Patient   first message
+  <div class="panel" data-panel="findings" hidden><section class="doc-sec"><h2 data-c="findings:c6c4fc52">What the 34 chats show</h2><h3 data-c="findings:31d90c6c">What breaks the "talking to a doctor" feel</h3>
+<div class="table"><table><thead><tr><th>#</th><th>What happens</th><th>Evidence</th></tr></thead><tbody><tr data-c="findings:f7fffeb0"><td>1</td><td><strong>It is a quiz.</strong> Over half the questions are yes/no, a third are lists of options inside the sentence, 1 in 20 is open. A third of all patient answers are a plain "no".</td><td>90 yes/no, 54 lists, 8 open of 172. 56 answers start with "no". Median answer 4 words; 41% are 3 words or fewer.</td></tr><tr data-c="findings:a31062bf"><td>2</td><td><strong>The same opener on every turn.</strong> "Okay… / Achha… / Oh…" then an echo of the answer. The echo adds nothing ("Okay, no vomiting, that's a relief.").</td><td>165 of 172 replies start this way.</td></tr><tr data-c="findings:d4cd6bf5"><td>3</td><td><strong>Several questions in one.</strong> Some are then "fixed" in front of the patient.</td><td>8 replies with 2+ question marks, 27 with "and/or" in the question, 4 visible self-corrections ("Actually, let me ask it simply…").</td></tr><tr data-c="findings:f8471104"><td>4</td><td><strong>The same thing asked twice.</strong></td><td><a class="ep" href="#episode-F" title="Open episode F">c0235ec7-1</a>: palms and soles asked in turn 14, again in 16; creche asked in 12, again in 16. The patient answers "nothing else". <code>3baf38b5-2</code>: "has the jaw swelling got bigger since yesterday?" then "is that swelling bigger than yesterday?".</td></tr><tr data-c="findings:53e62a98"><td>5</td><td><strong>A list of places with no way out pushed a wrong answer.</strong> The patient picked "middle of the buttock"; three questions later the truth came out: "No it is inside anus". The patient was too shy to say it first.</td><td><a class="ep" href="#episode-B" title="Open episode B">203e8102-9</a></td></tr><tr data-c="findings:1fadce4b"><td>6</td><td><strong>An open location question confused.</strong> "Where in your belly does it hurt?" got "What do you mean". Naming a few places in the sentence worked straight after ("Lower").</td><td><a class="ep" href="#episode-A" title="Open episode A">2e103fa2-1</a></td></tr><tr data-c="findings:c7573e9c"><td>7</td><td><strong>A reply with no question ended the chat.</strong> Two replies in a row had no question; the chat stops there.</td><td><code>c92b074b-1</code></td></tr><tr data-c="findings:517fc398"><td>8</td><td><strong>System words leaked.</strong> "Your family file doesn't list a son…" And a name the patient never typed: "<span class="name" title="A real name, left out">name</span>, did I say his name to you?"</td><td><code>203e8102-1</code>, <code>fd743e41-1</code>, <code>203e8102-3</code></td></tr><tr data-c="findings:46134019"><td>9</td><td><strong>Questions the typist can't answer.</strong> A husband asked about his wife's last cycle: "Ummm umm I dont know".</td><td><code>0debe088-1</code></td></tr><tr data-c="findings:093ee41d"><td>10</td><td><strong>The cap decides.</strong> 11 of 21 finished chats stopped at exactly 8 questions, and 9 of those 11 were below the confidence needed to stop.</td><td><code>question_analysis.md</code> section 5</td></tr><tr data-c="findings:26d4a6ee"><td>11</td><td><strong>An unclear answer became a 112 message.</strong> "He is crying to drink or eat" (<code>203e8102-1</code>) and "I guess no" to passing urine (<code>203e8102-5</code>) both triggered the emergency message. In <code>-5</code> the patient corrected themselves two messages later: "ohh sorry he had the waters I missed that part" (<code>-7</code>). Only an observation: emergencies are not part of this draft.</td><td><code>203e8102-1</code>, <code>-5</code>, <code>-7</code></td></tr></tbody></table></div>
+<h3 data-c="findings:ca6aedec">What already works (keep and do more of)</h3>
+<ul><li data-c="findings:5111acd5"><strong>A reaction that carries information.</strong> The best turns tell the patient why the next question matters:<ul><li data-c="findings:db100cea">"That timing after the shawarma does make food upset a real possibility." (<a class="ep" href="#episode-D" title="Open episode D">b9d47118-1</a>)</li><li data-c="findings:87cfae4d">"Sores in the mouth with drooling and fussiness often point to a viral infection of the mouth." (<a class="ep" href="#episode-F" title="Open episode F">c0235ec7-1</a>)</li><li data-c="findings:ce4f0162">"Waves of cramping low in the belly fit with a gut infection." (<a class="ep" href="#episode-D" title="Open episode D">b9d47118-1</a>)</li></ul>
+<p data-c="findings:b9807519">The model already does a small version of "thinking aloud", even though the prompt forbids it.</p></li><li data-c="findings:4f9c38aa"><strong>Hearing a fear and answering it in a few words.</strong> "ye dar hona natural hai" (<a class="ep" href="#episode-C" title="Open episode C">39ae9855-1</a>). "That's okay, a lot of people don't keep track" (<code>0debe088-1</code>). "Thanks for being open about that" (<a class="ep" href="#episode-E" title="Open episode E">fe2f0f97-1</a>).</li><li data-c="findings:6736a762"><strong>Mirroring the language.</strong> In <a class="ep" href="#episode-C" title="Open episode C">39ae9855-1</a> Vera spoke Hinglish and the patient wrote Hinglish.</li><li data-c="findings:d32aea68"><strong>A question that invites the patient's own words</strong> got the longest answer in all 34 chats (49 words): "By 'motion not fresh', do you mean loose watery stools?" (<code>3f64258e-1</code>). Also "Ye gud gudi feeling kab se ho rahi hai?" (17 words, with the cause and a worry).</li><li data-c="findings:7518e0e1"><strong>The patient matters as much as the question.</strong> The 12 longest answers come from 6 accounts, 4 of them from one. Short answers are partly a style, so the design has to work for both styles.</li></ul>
+<h3 data-c="findings:b06cc315">Moments where the patient showed a feeling</h3>
+<div class="table"><table><thead><tr><th>Cue</th><th>What the patient wrote</th><th>What the chat did</th></tr></thead><tbody><tr data-c="findings:b0c96da1"><td>fear</td><td>"lag raha mujhe dar hai pet na kharap ho abhi recently O2 khaya tha"</td><td>Answered it in 5 words, then moved on without asking what happened.</td></tr><tr data-c="findings:dad4a385"><td>shyness</td><td>"we had some good times together so you figure it out", "you know what I mean hehehe"</td><td>Thanked them for being open. Good.</td></tr><tr data-c="findings:9ca564df"><td>shyness (body)</td><td>said "buttocks" for a problem inside the anus</td><td>Not noticed; three questions wasted.</td></tr><tr data-c="findings:61af9a98"><td>confusion</td><td>"What do you mean"</td><td>Rephrased with examples. Good.</td></tr><tr data-c="findings:d1c8ff65"><td>not knowing</td><td>"Ummm umm I dont know"</td><td>Said it was normal. Good.</td></tr><tr data-c="findings:f2e7a8db"><td>impatience</td><td>"he plays with toddlers.. nothing else"</td><td>The question had just been asked twice. Not noticed.</td></tr><tr data-c="findings:c6595e27"><td>surprise at being known</td><td>"<span class="name" title="A real name, left out">name</span>, did I say his name to you?"</td><td>Apologised. The leak should not happen.</td></tr></tbody></table></div></section><div class="orphans" data-orphans="findings"></div></div><div class="panel" data-panel="shape" hidden><section class="doc-sec"><h2 data-c="shape:ac3ab090">How we want the patient to feel when it ends</h2><div class="table"><table><thead><tr><th>The patient should feel</th><th>What makes that happen</th></tr></thead><tbody><tr data-c="shape:41d7965e"><td><strong>Welcome</strong>, no form to fill in</td><td>An open invitation first. No list of questions.</td></tr><tr data-c="shape:28dece96"><td><strong>Heard</strong>, never repeating themselves</td><td>Uses their own words. Never asks twice. Never asks what the profile already says.</td></tr><tr data-c="shape:d9137b91"><td><strong>Understood</strong>, "she gets what it's like"</td><td>One accurate line about the experience, not a guess at their mood. If the cue is a fear, answer the fear.</td></tr><tr data-c="shape:d0f647f4"><td><strong>Guided</strong>, not interrogated</td><td>A short reason now and then ("so I can tell a tummy bug from…"). One "what I'm thinking" message.</td></tr><tr data-c="shape:1e672322"><td><strong>Safe to say the awkward thing</strong></td><td>A normalising half-sentence before a private question. Accept euphemisms. Never demand the exact word.</td></tr><tr data-c="shape:57d8c773"><td><strong>Unhurried but moving</strong></td><td>About 5 to 6 patient messages for a simple complaint, up to 9 or 10 for a complicated one. Never the same question twice.</td></tr></tbody></table></div></section><section class="doc-sec"><h2 data-c="shape:3e741329">The shape of an ideal chat</h2><pre data-c="shape:02da2fed">T1  Patient   first message
     Vera      Vague, or only a greeting  -&gt; an open invitation (&quot;tell me however it comes&quot;).
               Rich message               -&gt; straight to the first question.
 T2  Patient   answers
@@ -327,13 +400,13 @@ T5+ Patient   answers
               Warning signs that go together: ONE &quot;any of these&quot; sentence.
 End Vera      check-back: &quot;So far I&#x27;ve heard A, B, C. Is there something else I should know?&quot;
     Vera      assessment.</pre>
-<p><strong>Every reply is built the same way:</strong> a reaction in the patient's own words (at most 10), then, now and then, a reason (at most 10), then one question (at most 12). About 30 words in total. Not every reply needs all three. The first word is not always "Okay".</p>
-<p><strong>What "one thing" means.</strong> "Is he drinking water or milk?" is one thing. "Does he have a fever, and since when?" and "Have you taken anything for the cold, or flown recently?" are two. The one exception, flagged as decision 1 in section 8: a set of warning signs that belong together (hydration: drinking and passing urine; fever, chills or blood; stroke signs; signs of an infection spreading) can go in one short "any of these" sentence, because the patient answers it with one word ("no"). Unrelated questions are never joined.</p>
-<p><strong>By patient style:</strong></p>
-<div class="table"><table><thead><tr><th>Patient</th><th>Vera does</th></tr></thead><tbody><tr><td>Writes a lot (<a class="ep" href="#episode-D" title="Open episode D">b9d47118-1</a>)</td><td>Reflects more, asks fewer questions. Lets them finish.</td></tr><tr><td>Writes 1-2 words (<a class="ep" href="#episode-A" title="Open episode A">2e103fa2-1</a>)</td><td>One push at the start, then questions that need only a few words. Never a second push.</td></tr><tr><td>Shy about the body or intimacy</td><td>Normalises first, names a plain-words place, accepts euphemisms.</td></tr><tr><td>Typing for someone else</td><td>One line, once: "If she's nearby, she can answer too." Does not ask the typist what only she knows.</td></tr><tr><td>Says "what do you mean"</td><td>Rephrases once, with an example.</td></tr><tr><td>Says "not sure" or "I don't know"</td><td>Accepts it and moves on. Never re-asks.</td></tr><tr><td>Volunteers a fear</td><td>Answers it right then, before the next question.</td></tr><tr><td>Writes Hinglish</td><td>Vera writes Hinglish, in the feminine ("rahi hoon", "karti hoon").</td></tr></tbody></table></div></section></div><div class="panel" data-panel="rewrites" hidden><section class="doc-sec"><h2>A bank of question rewrites</h2><div class="table"><table><thead><tr><th>Real question</th><th>What went wrong</th><th>Better</th></tr></thead><tbody><tr><td>"What's been bothering you, and is it you who is unwell or someone else?" (<a class="ep" href="#episode-D" title="Open episode D">b9d47118-1</a>)</td><td>Two questions</td><td>"Tell me what's been going on, however it comes." (who it is about comes from the profile, or later)</td></tr><tr><td>"How old is your son, and has the drooling started suddenly or been building up?" (<a class="ep" href="#episode-F" title="Open episode F">c0235ec7-1</a>)</td><td>Two questions</td><td>"How old is he?" then, next turn, "When did the drooling start?"</td></tr><tr><td>"Where in your belly does it hurt the most?" (<a class="ep" href="#episode-A" title="Open episode A">2e103fa2-1</a>)</td><td>Open location, patient lost</td><td>"Is it higher up near the ribs, around the navel, or lower down?"</td></tr><tr><td>"Which spot hurts most: the outer hip side, the middle of the buttock…?" (<a class="ep" href="#episode-B" title="Open episode B">203e8102-9</a>)</td><td>No way out, no privacy</td><td>"Say it as plainly as you like, doctors hear this every day. Where does it hurt: the hip side, the middle, near the tailbone, or inside near the passage?"</td></tr><tr><td>"Your family file doesn't list a son, so how old is he?"</td><td>System words</td><td>"How old is he?"</td></tr><tr><td>"Has he had a fever? / Any vomiting? / Any loose motions?" (three turns)</td><td>Three "no" turns</td><td>"Any of these with it: fever, vomiting, loose motions?" (one question, one short answer)</td></tr><tr><td>"Okay, no vomiting, that's a relief. Have you had any fever?"</td><td>Echo that adds nothing</td><td>"No vomiting, good. Any fever with it?"</td></tr><tr><td>"Do you have any other symptoms?"</td><td>Catch-all</td><td>"Is there something else you'd like me to know?" (the "something" form works better than "anything": section 6)</td></tr><tr><td>"Has the swelling got bigger since yesterday?" then "Is that swelling bigger than yesterday?" (<code>3baf38b5-2</code>)</td><td>Repeat</td><td>Ask once. Keep a list of what was asked.</td></tr><tr><td>"Was her last period normal in timing?" asked to the husband (<code>0debe088-1</code>)</td><td>Typist cannot know</td><td>Skip it, or "If she's nearby she can tell you."</td></tr><tr><td>"Achha, theek hai, centre of the upper belly. Has there been vomiting?"</td><td>Echo plus quiz</td><td>"Centre of the upper belly, got it. Did it start after that meal?" (a story question)</td></tr><tr><td>"Ye gud gudi feeling kab se ho rahi hai?" (<a class="ep" href="#episode-C" title="Open episode C">39ae9855-1</a>)</td><td>Already good</td><td>Keep.</td></tr></tbody></table></div></section></div><div class="panel" data-panel="evidence" hidden><section class="doc-sec"><h2>Evidence behind the draft's choices</h2><div class="table"><table><thead><tr><th>Choice</th><th>Backed by</th><th>Strength</th></tr></thead><tbody><tr><td>Open invitation, patients finish quickly</td><td>Langewitz 2002, BMJ: 335 patients, mean spontaneous talking time 92 s, median 59 s, 78% finished within 2 min</td><td>A real study, in person</td></tr><tr><td>"Is there <strong>something</strong> else…?"</td><td>Heritage 2007, J Gen Intern Med: "something" removed 78% of unmet concerns, "anything" did no better than control</td><td>A randomised trial, in person</td></tr><tr><td>Acknowledge, prompt, probe</td><td>Xiao et al. 2020: a chatbot got 90 vs 64 words per answer and more disclosure than a plain form</td><td>Gamers and a film trailer, not health</td></tr><tr><td>Ask "what does it feel like", in body words</td><td>Andrew et al. 2012: in Goa, psychological symptoms were rarely volunteered but easily drawn out; "head heavy", "chest suffocation"</td><td>One Indian primary-care study</td></tr><tr><td>Reflect a feeling in a few words</td><td>NURSE statements (VitalTalk)</td><td>A teaching guide, not a trial</td></tr><tr><td>Normalising before a private question; accepting "I don't know"; one "any of these" sentence for warning signs</td><td><strong>No source.</strong> This is my judgement from the chats above.</td><td>Needs testing</td></tr></tbody></table></div></section><section class="doc-sec"><h2>What this means for the prompt (not written yet)</h2><ul><li><strong>One thing to answer, not a word ban.</strong> "Food or water" is one thing; "fever, and since when" is two. The "no and/or" rule blocks the first and still lets some of the second through.</li><li><strong>A reply is a reaction, an occasional reason, and one question.</strong> About 30 words. Not always the same opener.</li><li><strong>Open invitation, then gauge, then one push.</strong> Skipped when the first message is already rich. The invitation is the whole reply.</li><li><strong>"What I'm thinking" once</strong>, in the reply to the second or third answer. After that, replies react to what the patient said and do not repeat what it might be.</li><li><strong>Name a few places in the sentence</strong> for pain, swelling or a rash, with "somewhere else" last. For private areas, a plain-words place and a normalising half-sentence.</li><li><strong>Never say "file". Never say a name the patient did not type.</strong> Say "your list" if it has to be mentioned.</li><li><strong>Never ask the same thing twice. Never re-ask a "not sure".</strong></li><li><strong>A reply always ends with a question or an invitation</strong> (an emergency message is the one exception).</li><li><strong>The question cap:</strong> the invitation turn and the push do not count toward the 8.</li><li><strong>Vera writes as a woman</strong> in Hinglish.</li></ul>
-<p>What a first test of such a prompt showed (made-up patients played by a small model, 12 chats per prompt; drafts kept in <code>benchmark/prompt_v2/</code>):</p>
-<ul><li>Double questions went from 2 to 0 and visible self-corrections from 1 to 0. It opened with an invitation in 7 of 8 short first messages (today's prompt: 0 of 8).</li><li>It still restated what the problem might be more often than today's prompt (1.6 turns a chat against 0.8), and ran longer (28 words median against 22).</li><li>Without grouped warning signs, chats were no shorter (7.5 turns against 8.1). The grouped sentence in decision 1 is what gets to 5-6.</li><li>A speed question was left open: in one round the new prompt's slowest calls ran several seconds longer than today's (90% under 8.8 s against 3.7 s). That could be the rules making the model think longer, or an API slow patch; it was not measured further.</li><li>The simulated patients are a guess at how people answer. The test shows what the prompt does, not whether real patients open up.</li></ul></section></div><div class="panel" data-panel="decisions" hidden><section class="doc-sec"><h2>Decisions for the PM</h2><ol><li><strong>Warning signs: one at a time, or one "any of these" sentence?</strong> These drafts use the one sentence ("Any fever, chills or blood in the stool?"), which is how a doctor asks and is what makes 5-6 messages possible. One at a time is closer to the sketch's "no multiple questions in one" but makes the chat longer and more like a quiz. This is the biggest call. The same stretch of conversation D both ways:<div class="table"><table><thead><tr><th>Grouped (used above)</th><th>One at a time</th></tr></thead><tbody><tr><td><strong>Vera:</strong> Any fever, chills or blood in the stool?</td><td><strong>Vera:</strong> Any fever or chills?</td></tr><tr><td><strong>Patient:</strong> I dont have any fever or chills for now. no only yellow liquid stolls</td><td><strong>Patient:</strong> no fever, no chills</td></tr><tr><td></td><td><strong>Vera:</strong> Any blood in the stool?</td></tr><tr><td></td><td><strong>Patient:</strong> no only yellow liquid stolls</td></tr><tr><td>1 patient message</td><td>2 patient messages</td></tr></tbody></table></div>
-<p>Across a chat the one-at-a-time version adds 2 to 4 messages.</p></li><li><strong>"What I'm thinking" as one extra message,</strong> once, just before the next question. Is this the right place and the right length?</li><li><strong>The check-back before the assessment</strong> ("Is there something else I should know?"). Does it count toward the 8 questions? I suggest no.</li><li><strong>Target length.</strong> About 5 to 6 patient messages for a simple complaint and 8 to 10 for a complicated one. Is that right?</li><li><strong>Typing for someone else.</strong> One line, once ("If she's nearby, she can add to it too"). Agreed?</li><li><strong>Hinglish in the feminine</strong> ("samajh gayi", "rakh rahi hoon") now that Vera has one voice.</li><li><strong>The emergency message stays exactly as it is.</strong> The only change is the way there.</li></ol></section></div>
+<p data-c="shape:6e87f56c"><strong>Every reply is built the same way:</strong> a reaction in the patient's own words (at most 10), then, now and then, a reason (at most 10), then one question (at most 12). About 30 words in total. Not every reply needs all three. The first word is not always "Okay".</p>
+<p data-c="shape:33d8170d"><strong>What "one thing" means.</strong> "Is he drinking water or milk?" is one thing. "Does he have a fever, and since when?" and "Have you taken anything for the cold, or flown recently?" are two. The one exception, flagged as decision 1 in section 8: a set of warning signs that belong together (hydration: drinking and passing urine; fever, chills or blood; stroke signs; signs of an infection spreading) can go in one short "any of these" sentence, because the patient answers it with one word ("no"). Unrelated questions are never joined.</p>
+<p data-c="shape:dcf08622"><strong>By patient style:</strong></p>
+<div class="table"><table><thead><tr><th>Patient</th><th>Vera does</th></tr></thead><tbody><tr data-c="shape:636775f1"><td>Writes a lot (<a class="ep" href="#episode-D" title="Open episode D">b9d47118-1</a>)</td><td>Reflects more, asks fewer questions. Lets them finish.</td></tr><tr data-c="shape:0503daa9"><td>Writes 1-2 words (<a class="ep" href="#episode-A" title="Open episode A">2e103fa2-1</a>)</td><td>One push at the start, then questions that need only a few words. Never a second push.</td></tr><tr data-c="shape:93c58c88"><td>Shy about the body or intimacy</td><td>Normalises first, names a plain-words place, accepts euphemisms.</td></tr><tr data-c="shape:185b9e6e"><td>Typing for someone else</td><td>One line, once: "If she's nearby, she can answer too." Does not ask the typist what only she knows.</td></tr><tr data-c="shape:a1f8e2a7"><td>Says "what do you mean"</td><td>Rephrases once, with an example.</td></tr><tr data-c="shape:8a2fffb1"><td>Says "not sure" or "I don't know"</td><td>Accepts it and moves on. Never re-asks.</td></tr><tr data-c="shape:03d616ae"><td>Volunteers a fear</td><td>Answers it right then, before the next question.</td></tr><tr data-c="shape:ceca0f7e"><td>Writes Hinglish</td><td>Vera writes Hinglish, in the feminine ("rahi hoon", "karti hoon").</td></tr></tbody></table></div></section><div class="orphans" data-orphans="shape"></div></div><div class="panel" data-panel="rewrites" hidden><section class="doc-sec"><h2 data-c="rewrites:2e48c68b">A bank of question rewrites</h2><div class="table"><table><thead><tr><th>Real question</th><th>What went wrong</th><th>Better</th></tr></thead><tbody><tr data-c="rewrites:147d7d9a"><td>"What's been bothering you, and is it you who is unwell or someone else?" (<a class="ep" href="#episode-D" title="Open episode D">b9d47118-1</a>)</td><td>Two questions</td><td>"Tell me what's been going on, however it comes." (who it is about comes from the profile, or later)</td></tr><tr data-c="rewrites:92bb8fb4"><td>"How old is your son, and has the drooling started suddenly or been building up?" (<a class="ep" href="#episode-F" title="Open episode F">c0235ec7-1</a>)</td><td>Two questions</td><td>"How old is he?" then, next turn, "When did the drooling start?"</td></tr><tr data-c="rewrites:30446ca3"><td>"Where in your belly does it hurt the most?" (<a class="ep" href="#episode-A" title="Open episode A">2e103fa2-1</a>)</td><td>Open location, patient lost</td><td>"Is it higher up near the ribs, around the navel, or lower down?"</td></tr><tr data-c="rewrites:48e4e233"><td>"Which spot hurts most: the outer hip side, the middle of the buttock…?" (<a class="ep" href="#episode-B" title="Open episode B">203e8102-9</a>)</td><td>No way out, no privacy</td><td>"Say it as plainly as you like, doctors hear this every day. Where does it hurt: the hip side, the middle, near the tailbone, or inside near the passage?"</td></tr><tr data-c="rewrites:78c6cfe2"><td>"Your family file doesn't list a son, so how old is he?"</td><td>System words</td><td>"How old is he?"</td></tr><tr data-c="rewrites:a0634645"><td>"Has he had a fever? / Any vomiting? / Any loose motions?" (three turns)</td><td>Three "no" turns</td><td>"Any of these with it: fever, vomiting, loose motions?" (one question, one short answer)</td></tr><tr data-c="rewrites:3429a66d"><td>"Okay, no vomiting, that's a relief. Have you had any fever?"</td><td>Echo that adds nothing</td><td>"No vomiting, good. Any fever with it?"</td></tr><tr data-c="rewrites:300d695e"><td>"Do you have any other symptoms?"</td><td>Catch-all</td><td>"Is there something else you'd like me to know?" (the "something" form works better than "anything": section 6)</td></tr><tr data-c="rewrites:7bc4912c"><td>"Has the swelling got bigger since yesterday?" then "Is that swelling bigger than yesterday?" (<code>3baf38b5-2</code>)</td><td>Repeat</td><td>Ask once. Keep a list of what was asked.</td></tr><tr data-c="rewrites:d609723e"><td>"Was her last period normal in timing?" asked to the husband (<code>0debe088-1</code>)</td><td>Typist cannot know</td><td>Skip it, or "If she's nearby she can tell you."</td></tr><tr data-c="rewrites:a136ba5f"><td>"Achha, theek hai, centre of the upper belly. Has there been vomiting?"</td><td>Echo plus quiz</td><td>"Centre of the upper belly, got it. Did it start after that meal?" (a story question)</td></tr><tr data-c="rewrites:14f546e4"><td>"Ye gud gudi feeling kab se ho rahi hai?" (<a class="ep" href="#episode-C" title="Open episode C">39ae9855-1</a>)</td><td>Already good</td><td>Keep.</td></tr></tbody></table></div></section><div class="orphans" data-orphans="rewrites"></div></div><div class="panel" data-panel="evidence" hidden><section class="doc-sec"><h2 data-c="evidence:0989cb82">Evidence behind the draft's choices</h2><div class="table"><table><thead><tr><th>Choice</th><th>Backed by</th><th>Strength</th></tr></thead><tbody><tr data-c="evidence:99a41988"><td>Open invitation, patients finish quickly</td><td>Langewitz 2002, BMJ: 335 patients, mean spontaneous talking time 92 s, median 59 s, 78% finished within 2 min</td><td>A real study, in person</td></tr><tr data-c="evidence:3538d369"><td>"Is there <strong>something</strong> else…?"</td><td>Heritage 2007, J Gen Intern Med: "something" removed 78% of unmet concerns, "anything" did no better than control</td><td>A randomised trial, in person</td></tr><tr data-c="evidence:95ec2fe9"><td>Acknowledge, prompt, probe</td><td>Xiao et al. 2020: a chatbot got 90 vs 64 words per answer and more disclosure than a plain form</td><td>Gamers and a film trailer, not health</td></tr><tr data-c="evidence:a0824d45"><td>Ask "what does it feel like", in body words</td><td>Andrew et al. 2012: in Goa, psychological symptoms were rarely volunteered but easily drawn out; "head heavy", "chest suffocation"</td><td>One Indian primary-care study</td></tr><tr data-c="evidence:7ee69f3b"><td>Reflect a feeling in a few words</td><td>NURSE statements (VitalTalk)</td><td>A teaching guide, not a trial</td></tr><tr data-c="evidence:969aec60"><td>Normalising before a private question; accepting "I don't know"; one "any of these" sentence for warning signs</td><td><strong>No source.</strong> This is my judgement from the chats above.</td><td>Needs testing</td></tr></tbody></table></div></section><section class="doc-sec"><h2 data-c="evidence:81f2d477">What this means for the prompt (not written yet)</h2><ul><li data-c="evidence:9d74296f"><strong>One thing to answer, not a word ban.</strong> "Food or water" is one thing; "fever, and since when" is two. The "no and/or" rule blocks the first and still lets some of the second through.</li><li data-c="evidence:c43ef9cc"><strong>A reply is a reaction, an occasional reason, and one question.</strong> About 30 words. Not always the same opener.</li><li data-c="evidence:b4c72916"><strong>Open invitation, then gauge, then one push.</strong> Skipped when the first message is already rich. The invitation is the whole reply.</li><li data-c="evidence:fcdcc66e"><strong>"What I'm thinking" once</strong>, in the reply to the second or third answer. After that, replies react to what the patient said and do not repeat what it might be.</li><li data-c="evidence:35f5b7be"><strong>Name a few places in the sentence</strong> for pain, swelling or a rash, with "somewhere else" last. For private areas, a plain-words place and a normalising half-sentence.</li><li data-c="evidence:bd2397bd"><strong>Never say "file". Never say a name the patient did not type.</strong> Say "your list" if it has to be mentioned.</li><li data-c="evidence:24fe24b5"><strong>Never ask the same thing twice. Never re-ask a "not sure".</strong></li><li data-c="evidence:acc178f1"><strong>A reply always ends with a question or an invitation</strong> (an emergency message is the one exception).</li><li data-c="evidence:17feeffb"><strong>The question cap:</strong> the invitation turn and the push do not count toward the 8.</li><li data-c="evidence:866f497f"><strong>Vera writes as a woman</strong> in Hinglish.</li></ul>
+<p data-c="evidence:af98de7d">What a first test of such a prompt showed (made-up patients played by a small model, 12 chats per prompt; drafts kept in <code>benchmark/prompt_v2/</code>):</p>
+<ul><li data-c="evidence:f4909894">Double questions went from 2 to 0 and visible self-corrections from 1 to 0. It opened with an invitation in 7 of 8 short first messages (today's prompt: 0 of 8).</li><li data-c="evidence:4c3dd027">It still restated what the problem might be more often than today's prompt (1.6 turns a chat against 0.8), and ran longer (28 words median against 22).</li><li data-c="evidence:5a6b1c9e">Without grouped warning signs, chats were no shorter (7.5 turns against 8.1). The grouped sentence in decision 1 is what gets to 5-6.</li><li data-c="evidence:3e06f806">A speed question was left open: in one round the new prompt's slowest calls ran several seconds longer than today's (90% under 8.8 s against 3.7 s). That could be the rules making the model think longer, or an API slow patch; it was not measured further.</li><li data-c="evidence:c14d305b">The simulated patients are a guess at how people answer. The test shows what the prompt does, not whether real patients open up.</li></ul></section><div class="orphans" data-orphans="evidence"></div></div><div class="panel" data-panel="decisions" hidden><section class="doc-sec"><h2 data-c="decisions:1ffbae42">Decisions for the PM</h2><ol><li data-c="decisions:62289ae5"><strong>Warning signs: one at a time, or one "any of these" sentence?</strong> These drafts use the one sentence ("Any fever, chills or blood in the stool?"), which is how a doctor asks and is what makes 5-6 messages possible. One at a time is closer to the sketch's "no multiple questions in one" but makes the chat longer and more like a quiz. This is the biggest call. The same stretch of conversation D both ways:<div class="table"><table><thead><tr><th>Grouped (used above)</th><th>One at a time</th></tr></thead><tbody><tr data-c="decisions:25830c29"><td><strong>Vera:</strong> Any fever, chills or blood in the stool?</td><td><strong>Vera:</strong> Any fever or chills?</td></tr><tr data-c="decisions:cb8b3b2f"><td><strong>Patient:</strong> I dont have any fever or chills for now. no only yellow liquid stolls</td><td><strong>Patient:</strong> no fever, no chills</td></tr><tr data-c="decisions:922f9462"><td></td><td><strong>Vera:</strong> Any blood in the stool?</td></tr><tr data-c="decisions:2f4b73b2"><td></td><td><strong>Patient:</strong> no only yellow liquid stolls</td></tr><tr data-c="decisions:a84c7275"><td>1 patient message</td><td>2 patient messages</td></tr></tbody></table></div>
+<p data-c="decisions:63e947b6">Across a chat the one-at-a-time version adds 2 to 4 messages.</p></li><li data-c="decisions:fcd14b62"><strong>"What I'm thinking" as one extra message,</strong> once, just before the next question. Is this the right place and the right length?</li><li data-c="decisions:61655291"><strong>The check-back before the assessment</strong> ("Is there something else I should know?"). Does it count toward the 8 questions? I suggest no.</li><li data-c="decisions:3b513b95"><strong>Target length.</strong> About 5 to 6 patient messages for a simple complaint and 8 to 10 for a complicated one. Is that right?</li><li data-c="decisions:3e0b114a"><strong>Typing for someone else.</strong> One line, once ("If she's nearby, she can add to it too"). Agreed?</li><li data-c="decisions:d90ea89f"><strong>Hinglish in the feminine</strong> ("samajh gayi", "rakh rahi hoon") now that Vera has one voice.</li><li data-c="decisions:7ed5553b"><strong>The emergency message stays exactly as it is.</strong> The only change is the way there.</li></ol></section><div class="orphans" data-orphans="decisions"></div></div>
 </main>
 <footer class="wrap">Built from <code>ideal_conversation.md</code>. Episode ids like <code>39ae9855-1</code> point to the real chat, kept privately. The app and its prompt are unchanged.</footer>
 <script>
@@ -363,6 +436,334 @@ End Vera      check-back: &quot;So far I&#x27;ve heard A, B, C. Is there somethi
   if (select) select.addEventListener('change', function () { location.hash = 'episode-' + select.value; });
   window.addEventListener('hashchange', function () { show(location.hash); window.scrollTo({ top: 0 }); });
   show(location.hash);
+})();
+</script>
+<script>
+/* Comments: stored in Supabase, reached only through passcode-checked functions. All comment text is set with
+   textContent, never as HTML. */
+(function () {
+  var CFG = { url: 'https://feasaiavkfgaorazjhfw.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlYXNhaWF2a2ZnYW9yYXpqaGZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMTAwNzQsImV4cCI6MjEwODY4NjA3NH0.RuZK9wvhp-O5H7uu7hdGIYY0arabQNR7Ujt1nkDyf7M' };
+  function get(k) { try { return localStorage.getItem('review_' + k); } catch (e) { return null; } }
+  function put(k, v) { try { if (v == null) localStorage.removeItem('review_' + k); else localStorage.setItem('review_' + k, v); } catch (e) {} }
+  var S = { pass: get('pass'), name: get('name'), list: [], on: false, open: null };
+  var $ = function (id) { return document.getElementById(id); };
+  var hoverless = window.matchMedia && window.matchMedia('(hover: none)').matches;
+
+  function rpc(fn, args) {
+    return fetch(CFG.url + '/rest/v1/rpc/' + fn, {
+      method: 'POST',
+      headers: { apikey: CFG.key, Authorization: 'Bearer ' + CFG.key, 'Content-Type': 'application/json' },
+      body: JSON.stringify(args)
+    }).then(function (r) {
+      return r.text().then(function (t) {
+        var d = null;
+        try { d = t ? JSON.parse(t) : null; } catch (e) { /* not JSON */ }
+        if (!r.ok) throw new Error((d && d.message) || ('error ' + r.status));
+        return d;
+      });
+    });
+  }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function button(cls, text, fn) { var b = el('button', cls, text); b.type = 'button'; b.addEventListener('click', fn); return b; }
+  function when(iso) {
+    var d = new Date(iso), s = (Date.now() - d.getTime()) / 1000;
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.floor(s / 60) + ' min ago';
+    if (s < 86400) return Math.floor(s / 3600) + ' h ago';
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) + ', ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  }
+  function panelOf(section) { return (section.indexOf('ep-') === 0 || section === 'episodes') ? 'episodes' : section; }
+  function blockFor(anchor) { return document.querySelector('[data-c="' + CSS.escape(anchor) + '"]'); }
+  function btnHost(block) { return block.tagName === 'TR' ? block.lastElementChild : block; }
+  function lineText(block) {
+    var c = block.cloneNode(true);
+    c.querySelectorAll('.c-btn, .thread-wrap').forEach(function (x) { x.remove(); });
+    return c.textContent.replace(/\s+/g, ' ').trim().slice(0, 2000);
+  }
+  function byId(id) { for (var i = 0; i < S.list.length; i++) if (S.list[i].id === id) return S.list[i]; return null; }
+  function tops(anchor) { return S.list.filter(function (c) { return c.anchor === anchor && !c.parent_id; }); }
+  function replies(id) { return S.list.filter(function (c) { return c.parent_id === id; }); }
+
+  // ---------- one thread: the comments on one line, with a box to add one ----------
+  function buildThread(anchor, quote, keepOpen) {
+    var st = { replyTo: null, quote: quote || null };
+    var box = el('div', 'thread'); box.dataset.anchor = anchor;
+    var items = el('div', 't-items');
+    var ctx = el('div', 't-ctx');
+    var ta = el('textarea'); ta.placeholder = 'Add a comment…'; ta.maxLength = 4000; ta.setAttribute('aria-label', 'Your comment');
+    var err = el('span', 'c-err');
+    var post = button('cbar-btn primary', 'Comment', send);
+    var acts = el('div', 't-actions'); acts.append(post);
+    if (!keepOpen) acts.append(button('linkish', 'Close', function () { closeThread(); decorate(); }));
+    acts.append(err);
+    box.append(items, ctx, ta, acts);
+
+    function context() {
+      ctx.textContent = '';
+      var r = st.replyTo && byId(st.replyTo);
+      if (r) ctx.append(el('span', null, 'Replying to ' + r.author));
+      else if (st.quote) ctx.append(el('span', null, 'On the words'), el('q', null, st.quote));
+      ctx.hidden = !(r || st.quote);
+      if (!ctx.hidden) ctx.append(button('linkish', 'clear', function () { st.replyTo = null; st.quote = null; context(); }));
+      post.textContent = r ? 'Reply' : 'Comment';
+      ta.placeholder = r ? 'Write a reply…' : 'Add a comment…';
+    }
+    function fill() {
+      items.textContent = '';
+      var list = tops(anchor);
+      if (!list.length) items.append(el('p', 't-empty', 'No comments yet.'));
+      list.forEach(function (c) { items.append(item(c)); });
+    }
+    function item(c) {
+      var d = el('div', 'c-item');
+      var meta = el('div', 'c-meta'); meta.append(el('b', null, c.author), document.createTextNode(' · ' + when(c.created_at)));
+      meta.title = new Date(c.created_at).toLocaleString();
+      d.append(meta);
+      if (c.quote) d.append(el('div', 'c-q', '“' + c.quote + '”'));
+      d.append(el('div', 'c-body', c.body));
+      var acts = el('div', 'c-acts');
+      if (!c.parent_id) acts.append(button('linkish', 'Reply', function () { st.replyTo = c.id; st.quote = null; context(); ta.focus(); }));
+      var del = button('linkish', 'Delete', function () {
+        acts.textContent = '';
+        acts.append(el('span', null, c.parent_id ? 'Delete this reply?' : 'Delete this comment and its replies?'),
+          button('linkish', 'Yes, delete', function () { remove(c, acts); }),
+          button('linkish', 'No', function () { fill(); }));
+      });
+      acts.append(del);
+      d.append(acts);
+      var rs = replies(c.id);
+      if (rs.length) { var wrap = el('div', 'c-replies'); rs.forEach(function (x) { wrap.append(item(x)); }); d.append(wrap); }
+      return d;
+    }
+    function send() {
+      var body = ta.value.trim();
+      if (!body) { ta.focus(); return; }
+      var parent = st.replyTo ? byId(st.replyTo) : null;
+      var block = blockFor(anchor);
+      post.disabled = true; err.textContent = '';
+      rpc('add_comment', {
+        p_passcode: S.pass, p_anchor: anchor,
+        p_section: parent ? parent.section : anchor.split(':')[0],
+        p_line_text: block ? lineText(block) : (parent ? parent.line_text : ''),
+        p_quote: parent ? null : st.quote, p_parent_id: parent ? parent.id : null,
+        p_author: S.name, p_body: body
+      }).then(function (row) {
+        S.list.push(row); ta.value = ''; st.replyTo = null; st.quote = null;
+        context(); fill(); decorate();
+      }).catch(function (e) { err.textContent = 'Not saved: ' + e.message; })
+        .then(function () { post.disabled = false; });
+    }
+    function remove(c, acts) {
+      rpc('delete_comment', { p_passcode: S.pass, p_id: c.id }).then(function () {
+        var gone = {}; gone[c.id] = true;
+        S.list = S.list.filter(function (x) { return !gone[x.id] && !gone[x.parent_id]; });
+        refill(); decorate();
+      }).catch(function (e) { acts.textContent = ''; acts.append(el('span', 'c-err', 'Not deleted: ' + e.message)); });
+    }
+    box._fill = fill;
+    context(); fill();
+    return box;
+  }
+  function refill() { document.querySelectorAll('.thread').forEach(function (t) { if (t._fill) t._fill(); }); }
+
+  function closeThread() {
+    document.querySelectorAll('.thread-wrap.line').forEach(function (x) { x.remove(); });
+    S.open = null;
+  }
+  function openThread(anchor, quote) {
+    closeThread();
+    var block = blockFor(anchor);
+    if (!block) return;
+    S.open = anchor;
+    var box = buildThread(anchor, quote, false), wrap;
+    if (block.tagName === 'TR') {
+      wrap = el('tr', 'thread-wrap line thread-row');
+      var td = el('td'); td.colSpan = block.children.length; td.append(box); wrap.append(td);
+      block.after(wrap);
+    } else {
+      wrap = el('div', 'thread-wrap line'); wrap.append(box);
+      if (block.tagName === 'LI') block.append(wrap); else block.after(wrap);
+    }
+    decorate();
+    var ta = box.querySelector('textarea');
+    if (ta) ta.focus();
+  }
+
+  // ---------- markers on the page ----------
+  function setBadge(node, cls, n) {
+    var b = node.querySelector('.' + cls);
+    if (!n) { if (b) b.remove(); return; }
+    if (!b) { b = el('span', cls); node.append(b); }
+    b.textContent = '💬 ' + n;
+  }
+  function decorate() {
+    var count = {};
+    S.list.forEach(function (c) { count[c.anchor] = (count[c.anchor] || 0) + 1; });
+    document.querySelectorAll('[data-c]').forEach(function (block) {
+      var host = btnHost(block);
+      if (!host) return;
+      var b = host.querySelector(':scope > .c-btn');
+      if (!b) {
+        b = button('c-btn', '', function (ev) {
+          ev.stopPropagation();
+          if (S.open === block.dataset.c) { closeThread(); decorate(); } else openThread(block.dataset.c, null);
+        });
+        host.append(b);
+      }
+      var n = count[block.dataset.c] || 0;
+      b.textContent = n ? '💬 ' + n : '💬';
+      b.title = n ? n + (n > 1 ? ' comments' : ' comment') : 'Comment on this';
+      b.setAttribute('aria-label', b.title);
+      b.classList.toggle('has', n > 0);
+      b.classList.toggle('open', S.open === block.dataset.c);
+    });
+    document.querySelectorAll('.pick').forEach(function (p) {
+      setBadge(p, 'pick-c', S.list.filter(function (c) { return c.section === 'ep-' + p.dataset.ep; }).length);
+    });
+    document.querySelectorAll('.tab').forEach(function (t) {
+      setBadge(t, 'tab-c', S.list.filter(function (c) { return panelOf(c.section) === t.dataset.tab; }).length);
+    });
+    $('c-total').textContent = S.list.length + (S.list.length === 1 ? ' comment' : ' comments');
+    orphans();
+    highlight();
+  }
+
+  // comments whose line was reworded or removed: keep them visible at the end of their section
+  function orphans() {
+    var groups = {};
+    S.list.forEach(function (c) {
+      if (c.parent_id || blockFor(c.anchor)) return;
+      var box = document.querySelector('.orphans[data-orphans="' + CSS.escape(c.section) + '"]') || document.querySelector('.orphans[data-orphans="episodes"]');
+      var key = box.dataset.orphans;
+      (groups[key] = groups[key] || {})[c.anchor] = c.line_text;
+    });
+    document.querySelectorAll('.orphans').forEach(function (box) {
+      var g = groups[box.dataset.orphans] || {};
+      var sig = Object.keys(g).sort().join('|');
+      if (box.dataset.sig === sig) return;
+      box.dataset.sig = sig;
+      box.textContent = '';
+      if (!sig) return;
+      box.append(el('h4', null, 'Comments on lines that have changed since'));
+      Object.keys(g).forEach(function (a) {
+        box.append(el('div', 'orphan-line', 'The line was: ' + (g[a] || '(unknown)')));
+        var wrap = el('div', 'thread-wrap'); wrap.append(buildThread(a, null, true)); box.append(wrap);
+      });
+    });
+  }
+
+  // yellow highlight on the words a comment was made on
+  function findRange(root, quote) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) { return n.parentElement && n.parentElement.closest('.c-btn, .thread-wrap') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; }
+    });
+    var nodes = [], text = '', n;
+    while ((n = walker.nextNode())) { nodes.push([n, text.length]); text += n.data; }
+    var i = text.toLowerCase().indexOf(quote.toLowerCase());
+    if (i < 0) return null;
+    var end = i + quote.length, r = document.createRange(), started = false;
+    for (var k = 0; k < nodes.length; k++) {
+      var node = nodes[k][0], off = nodes[k][1], len = node.data.length;
+      if (!started && i < off + len) { r.setStart(node, i - off); started = true; }
+      if (started && end <= off + len) { r.setEnd(node, end - off); return r; }
+    }
+    return null;
+  }
+  function highlight() {
+    if (!window.CSS || !CSS.highlights || typeof Highlight === 'undefined') return;
+    var ranges = [];
+    S.list.forEach(function (c) {
+      if (!c.quote) return;
+      var b = blockFor(c.anchor);
+      var r = b && findRange(b, c.quote);
+      if (r) ranges.push(r);
+    });
+    CSS.highlights.set('cquote', new Highlight(...ranges));
+  }
+
+  // ---------- select words, then "Comment" ----------
+  var selBtn = button('sel-btn', 'Comment', function () {
+    if (!pending) return;
+    var p = pending; pending = null; selBtn.hidden = true;
+    var sel = window.getSelection(); if (sel) sel.removeAllRanges();
+    openThread(p.anchor, p.quote);
+  });
+  selBtn.hidden = true;
+  selBtn.addEventListener('mousedown', function (e) { e.preventDefault(); });
+  document.body.append(selBtn);
+  var pending = null;
+  function blockOf(node) {
+    var e = node && (node.nodeType === 1 ? node : node.parentElement);
+    if (!e || e.closest('.thread-wrap, .c-btn, .cbar, .sel-btn')) return null;
+    return e.closest('[data-c]');
+  }
+  function onSelect() {
+    if (!S.on) return;
+    var sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) { selBtn.hidden = true; return; }
+    var q = sel.toString().replace(/\s+/g, ' ').trim();
+    var r = sel.getRangeAt(0), a = blockOf(r.startContainer), b = blockOf(r.endContainer);
+    if (!q || !a || a !== b || q.length > 1000) { selBtn.hidden = true; return; }
+    var rect = r.getBoundingClientRect();
+    selBtn.style.top = Math.max(0, rect.top + window.scrollY - 42) + 'px';
+    selBtn.style.left = Math.min(document.documentElement.clientWidth - 120, Math.max(8, rect.left + window.scrollX)) + 'px';
+    selBtn.hidden = false;
+    pending = { anchor: a.dataset.c, quote: q };
+  }
+  document.addEventListener('mouseup', function () { setTimeout(onSelect, 0); });
+  document.addEventListener('keyup', function (e) { if (e.shiftKey) onSelect(); });
+  document.addEventListener('selectionchange', function () { if (hoverless) setTimeout(onSelect, 300); });
+  document.addEventListener('mousedown', function (e) { if (e.target !== selBtn) selBtn.hidden = true; });
+
+  // phones have no hover: a tap on a line shows its 💬
+  document.addEventListener('click', function (e) {
+    if (!S.on || !hoverless || e.target.closest('a, button, input, textarea, select, .thread-wrap')) return;
+    var b = e.target.closest('[data-c]');
+    document.querySelectorAll('.tapped').forEach(function (x) { if (x !== b) x.classList.remove('tapped'); });
+    if (b) b.classList.add('tapped');
+  });
+
+  // ---------- turning comments on and off ----------
+  function turnOn(name, pass) {
+    return rpc('list_comments', { p_passcode: pass }).then(function (rows) {
+      S.name = name; S.pass = pass; put('name', name); put('pass', pass);
+      S.list = rows || []; S.on = true;
+      document.body.classList.add('commenting');
+      $('c-on').hidden = true; $('c-form').hidden = true; $('c-status').hidden = false;
+      $('c-who').textContent = name;
+      decorate();
+    });
+  }
+  function turnOff() {
+    S.on = false; S.list = []; S.open = null; put('pass', null);
+    document.body.classList.remove('commenting');
+    document.querySelectorAll('.c-btn, .thread-wrap, .pick-c, .tab-c').forEach(function (x) { x.remove(); });
+    document.querySelectorAll('.orphans').forEach(function (x) { x.textContent = ''; delete x.dataset.sig; });
+    if (window.CSS && CSS.highlights) CSS.highlights.delete('cquote');
+    $('c-status').hidden = true; $('c-on').hidden = false;
+  }
+  function refresh() {
+    if (!S.on) return;
+    rpc('list_comments', { p_passcode: S.pass }).then(function (rows) { S.list = rows || []; refill(); decorate(); }).catch(function () {});
+  }
+  $('c-on').addEventListener('click', function () {
+    $('c-on').hidden = true; $('c-form').hidden = false;
+    $('c-name').value = S.name || '';
+    ($('c-name').value ? $('c-pass') : $('c-name')).focus();
+  });
+  $('c-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var n = $('c-name').value.trim(), p = $('c-pass').value;
+    if (!n || !p) return;
+    $('c-form-err').textContent = 'Checking…';
+    turnOn(n, p).then(function () { $('c-form-err').textContent = ''; $('c-pass').value = ''; })
+      .catch(function (err) { $('c-form-err').textContent = /passcode/.test(err.message) ? 'That passcode is not right.' : 'Could not connect: ' + err.message; });
+  });
+  $('c-off').addEventListener('click', turnOff);
+  $('c-refresh').addEventListener('click', refresh);
+  setInterval(function () { if (S.on && document.visibilityState === 'visible' && !document.querySelector('.thread textarea:focus')) refresh(); }, 45000);
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') refresh(); });
+  if (S.pass && S.name) turnOn(S.name, S.pass).catch(function () { put('pass', null); });
 })();
 </script>
 </body>

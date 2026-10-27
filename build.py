@@ -4,6 +4,7 @@ Usage:  python3 build.py [path/to/ideal_conversation.md]
 Default source: ../ChatBot/benchmark/episodes/ideal_conversation.md
 Writes index.html next to this file. Plain Python 3, no packages.
 """
+import hashlib
 import html
 import re
 import sys
@@ -13,8 +14,28 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 SRC = Path(sys.argv[1]) if len(sys.argv) > 1 else HERE.parent / "ChatBot/benchmark/episodes/ideal_conversation.md"
 
+# Comments live in a separate Supabase project (supabase_setup.sql). The anon key is meant to be public: it can only
+# call the three passcode-checked functions, never read or write the tables directly.
+SUPABASE_URL = "https://feasaiavkfgaorazjhfw.supabase.co"
+SUPABASE_ANON_KEY = ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlYXNhaWF2a2ZnYW9yYXpqaGZ3"
+                     "Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMTAwNzQsImV4cCI6MjEwODY4NjA3NH0."
+                     "RuZK9wvhp-O5H7uu7hdGIYY0arabQNR7Ujt1nkDyf7M")
+
 NAME = '<span class="name" title="A real name, left out">name</span>'
 EPISODE_IDS = {}  # "b9d47118-1" -> "D", filled once the episodes are read, so ids elsewhere link to them
+
+# Every commentable block gets data-c="<section>:<hash of its text>", so a comment stays on its line when lines are added
+# or moved. A reworded line gets a new hash; its old comments then show under "lines that changed".
+CTX = {"section": "page", "seen": {}}
+
+
+def anchor(inner_html):
+    text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", inner_html))).strip().lower()
+    h = hashlib.sha1(f'{CTX["section"]}|{text}'.encode()).hexdigest()[:8]
+    key = (CTX["section"], h)
+    n = CTX["seen"].get(key, 0)
+    CTX["seen"][key] = n + 1
+    return f' data-c="{CTX["section"]}:{h}{":" + str(n) if n else ""}"'
 
 
 # ---------- markdown, just the parts the draft uses ----------
@@ -50,7 +71,8 @@ def table(rows):
     out += [f"<th>{inline(c)}</th>" for c in head]
     out.append("</tr></thead><tbody>")
     for r in body:
-        out.append("<tr>" + "".join(f"<td>{inline(c)}</td>" for c in r) + "</tr>")
+        tds = "".join(f"<td>{inline(c)}</td>" for c in r)
+        out.append(f"<tr{anchor(tds)}>{tds}</tr>")
     out.append("</tbody></table></div>")
     return "".join(out)
 
@@ -88,8 +110,10 @@ def a_list(lines, i):
                 break
         head, rest = body[0], body[1:]
         pad = min((indent_of(x) for x in rest if x.strip()), default=0)
+        own = inline(head)
+        attr = anchor(own)
         inner = blocks([x[pad:] for x in rest]) if rest else ""
-        items.append(f"<li>{inline(head)}{inner}</li>")
+        items.append(f"<li{attr}>{own}{inner}</li>")
     tag = "ol" if ordered else "ul"
     return f"<{tag}>{''.join(items)}</{tag}>", i
 
@@ -104,11 +128,13 @@ def blocks(lines):
             j = i + 1
             while j < len(lines) and not lines[j].strip().startswith("```"):
                 j += 1
-            out.append("<pre>" + html.escape("\n".join(lines[i + 1:j])) + "</pre>")
+            code = html.escape("\n".join(lines[i + 1:j]))
+            out.append(f"<pre{anchor(code)}>{code}</pre>")
             i = j + 1
         elif re.match(r"#{3,4}\s", s):
             level = len(s.split()[0])
-            out.append(f"<h{level}>{inline(s[level:].strip())}</h{level}>")
+            h = inline(s[level:].strip())
+            out.append(f"<h{level}{anchor(h)}>{h}</h{level}>")
             i += 1
         elif s.startswith("|"):
             j = i
@@ -124,7 +150,8 @@ def blocks(lines):
             while j < len(lines) and lines[j].strip() and not re.match(r"(\||```|#{3,4}\s|---$)", lines[j].strip()) \
                     and not (j > i and ITEM.match(lines[j])):
                 j += 1
-            out.append("<p>" + inline(" ".join(x.strip() for x in lines[i:j])) + "</p>")
+            p = inline(" ".join(x.strip() for x in lines[i:j]))
+            out.append(f"<p{anchor(p)}>{p}</p>")
             i = j
     return "\n".join(out)
 
@@ -215,7 +242,9 @@ def render_turns(turns):
         else:
             who = "Vera"
         notes = "".join(f'<div class="note">{inline(n)}</div>' for n in t["notes"])
-        out.append(f'<div class="turn {k}"><div class="who">{who}</div><div class="said"><p>{inline(t["said"])}</p>{notes}</div></div>')
+        said = inline(t["said"])
+        out.append(f'<div class="turn {k}"{anchor(who + " " + said)}><div class="who">{who}</div>'
+                   f'<div class="said"><p>{said}</p>{notes}</div></div>')
     out.append("</div>")
     return "\n".join(out)
 
@@ -290,19 +319,34 @@ def build():
             f'<div class="fact"><span class="fact-k">{k}</span><span class="fact-v">{inline(v)}</span></div>'
             for k, v in (("Patient type", ptype), ("Patient messages, real → ideal", counts),
                          ("Lines that are expected, not real", expected), ("What it shows", shows)) if v)
-        after = "".join(f'<div class="after">{inline(a.strip("*") if a.startswith("*") and a.endswith("*") else a)}</div>'
-                        for a in e["after"])
+        CTX["section"] = f'ep-{e["letter"]}'
+        h2 = inline(title)
+        h2_attr = anchor("episode " + h2)
+        script = render_turns(parse_turns(e["quote"]))
+        after = ""
+        for a in e["after"]:
+            a_html = inline(a.strip("*") if a.startswith("*") and a.endswith("*") else a)
+            after += f'<div class="after"{anchor(a_html)}>{a_html}</div>'
         articles.append(
-            f'<article class="episode" id="ep-{e["letter"]}" data-ep="{e["letter"]}" hidden>'
+            f'<article class="episode" id="ep-{e["letter"]}" data-ep="{e["letter"]}" data-section="ep-{e["letter"]}" hidden>'
             f'<header class="ep-head"><p class="eyebrow">Episode {e["letter"]} · <code>{e["id"]}</code></p>'
-            f'<h2>{inline(title)}</h2><div class="facts">{facts}</div></header>'
-            f'{render_turns(parse_turns(e["quote"]))}{after}{nav}</article>')
+            f'<h2{h2_attr}>{h2}</h2><div class="facts">{facts}</div></header>'
+            f'{script}{after}<div class="orphans" data-orphans="ep-{e["letter"]}"></div>{nav}</article>')
 
     select = "".join(options)
 
-    def sec(key):
+    def sec(key, panel):
+        CTX["section"] = panel
         title, lines = secs[key]
-        return f'<section class="doc-sec"><h2>{inline(title)}</h2>{blocks(lines)}</section>'
+        h2 = inline(title)
+        return f'<section class="doc-sec"><h2{anchor(h2)}>{h2}</h2>{blocks(lines)}</section>'
+
+    CTX["section"] = "about"
+    about_html = blocks(about)
+    CTX["section"] = "episodes"
+    look_html = blocks(look)
+    how_html = blocks(ep_intro)
+    summary_html = table([x for x in ep_lines if x.strip().startswith("|")][:len(episodes) + 2])
 
     tabs = [
         ("episodes", f"Episodes ({len(episodes)})"),
@@ -313,24 +357,27 @@ def build():
         ("decisions", "Decisions"),
     ]
     panels = {
-        "findings": sec("1"),
-        "shape": sec("2") + sec("3"),
-        "rewrites": sec("4"),
-        "evidence": sec("6") + sec("7"),
-        "decisions": sec("8"),
+        "findings": sec("1", "findings"),
+        "shape": sec("2", "shape") + sec("3", "shape"),
+        "rewrites": sec("4", "rewrites"),
+        "evidence": sec("6", "evidence") + sec("7", "evidence"),
+        "decisions": sec("8", "decisions"),
     }
     tab_html = "".join(f'<a class="tab" href="#{k}" data-tab="{k}">{v}</a>' for k, v in tabs)
-    panel_html = "".join(f'<div class="panel" data-panel="{k}" hidden>{v}</div>' for k, v in panels.items())
+    panel_html = "".join(f'<div class="panel" data-panel="{k}" hidden>{v}<div class="orphans" data-orphans="{k}"></div></div>'
+                         for k, v in panels.items())
     updated = datetime.fromtimestamp(SRC.stat().st_mtime).strftime("%d %b %Y, %H:%M")
 
     page = TEMPLATE
     for k, v in {
         "{{TITLE}}": inline(intro_title),
         "{{TITLE_TEXT}}": html.escape(re.sub(r"[`*]", "", intro_title)),
-        "{{ABOUT}}": blocks(about),
-        "{{LOOK}}": blocks(look),
-        "{{HOW_TO_READ}}": blocks(ep_intro),
-        "{{SUMMARY}}": table([x for x in ep_lines if x.strip().startswith("|")][:len(episodes) + 2]),
+        "{{ABOUT}}": about_html,
+        "{{LOOK}}": look_html,
+        "{{HOW_TO_READ}}": how_html,
+        "{{SUMMARY}}": summary_html,
+        "{{SB_URL}}": SUPABASE_URL,
+        "{{SB_KEY}}": SUPABASE_ANON_KEY,
         "{{EP_TITLE}}": inline(ep_title),
         "{{PICKER}}": "".join(picker),
         "{{SELECT}}": select,
@@ -346,7 +393,7 @@ def build():
           f"{sum(len(parse_turns(e['quote'])) for e in episodes)} lines, from {SRC}")
 
 
-TEMPLATE = """<!doctype html>
+TEMPLATE = r"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -378,6 +425,7 @@ TEMPLATE = """<!doctype html>
   --danger: #f0a29a; --danger-bg: #3d2221; --code: #2a2c27;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 Inter, system-ui, -apple-system, sans-serif; }
 a { color: var(--accent); }
@@ -466,6 +514,61 @@ tr:last-child td { border-bottom: 0; }
 pre { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto;
   font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
 footer { color: var(--muted); font-size: 12.5px; padding: 24px 0 40px; border-top: 1px solid var(--line); }
+/* comments */
+.cbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 14px; font-size: 13.5px; }
+.cbar-btn { font: 500 13.5px Inter, system-ui, sans-serif; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink); cursor: pointer; }
+.cbar-btn:hover { border-color: var(--accent); }
+.cbar-btn.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.cbar-btn:disabled { opacity: .6; cursor: default; }
+.cbar-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.cbar-form input { font: inherit; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); width: 170px; }
+.cbar-on { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; color: var(--muted); }
+.cbar-on b { color: var(--ink); }
+.linkish { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.c-err { color: var(--danger); font-size: 13px; }
+.commenting [data-c] { position: relative; padding-right: 52px; }
+.commenting tr[data-c] { padding-right: 0; }
+.commenting tr[data-c] > td:last-child { position: relative; padding-right: 58px; }
+.c-btn { display: none; position: absolute; top: 2px; right: 0; align-items: center; font: 500 12px/1 Inter, system-ui, sans-serif;
+  padding: 4px 7px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; z-index: 2; }
+.turn > .c-btn { top: 12px; }
+td > .c-btn { top: 8px; right: 6px; }
+.c-btn:hover { border-color: var(--accent); color: var(--accent); }
+.c-btn.has { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.commenting [data-c]:hover > .c-btn, .commenting tr[data-c]:hover > td > .c-btn, .commenting .tapped > .c-btn,
+.commenting .tapped > td > .c-btn, .commenting .c-btn.has, .commenting .c-btn.open { display: inline-flex; }
+::highlight(cquote) { background-color: rgba(255, 205, 0, .38); }
+.sel-btn { position: absolute; z-index: 20; font: 600 12.5px Inter, system-ui, sans-serif; padding: 7px 11px; border-radius: 8px; border: 0;
+  background: var(--ink); color: var(--surface); box-shadow: 0 4px 14px rgba(0, 0, 0, .2); cursor: pointer; }
+.thread { margin: 6px 0 14px; padding: 12px 14px; border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 8px;
+  background: var(--surface); font: 14px/1.5 Inter, system-ui, sans-serif; color: var(--ink); text-align: left; }
+tr.thread-row > td { background: var(--bg); padding: 2px 12px 8px; }
+.c-item { padding: 8px 0; border-bottom: 1px solid var(--line); }
+.t-items > .c-item:last-child { border-bottom: 0; }
+.c-replies { margin: 6px 0 0 6px; padding-left: 12px; border-left: 2px solid var(--line); }
+.c-replies .c-item { border-bottom: 0; padding: 6px 0; }
+.c-meta { font-size: 12.5px; color: var(--muted); }
+.c-meta b { color: var(--ink); font-weight: 600; }
+.c-q { margin: 4px 0; padding: 1px 8px; border-left: 3px solid #e2bf2c; color: var(--muted); font-style: italic; }
+.c-body { white-space: pre-wrap; overflow-wrap: anywhere; }
+.c-acts { display: flex; gap: 12px; align-items: center; font-size: 12.5px; margin-top: 3px; color: var(--muted); }
+.t-empty { color: var(--muted); font-size: 13px; margin: 0 0 6px; }
+.t-ctx { font-size: 12.5px; color: var(--muted); margin: 8px 0 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.t-ctx q { font-style: italic; color: var(--ink); }
+.thread textarea { display: block; width: 100%; min-height: 64px; resize: vertical; font: inherit; padding: 8px 10px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--bg); color: var(--ink); }
+.thread textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.t-actions { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
+.orphans:empty { display: none; }
+.orphans { margin-top: 22px; padding: 12px 14px; border: 1px dashed var(--muted); border-radius: 10px; }
+.orphans h4 { margin: 0 0 4px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.orphan-line { font-size: 13.5px; color: var(--muted); margin: 12px 0 4px; }
+.pick { position: relative; }
+.pick-c, .tab-c { font: 600 11px/1 Inter, system-ui, sans-serif; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 6px; }
+.pick-c { position: absolute; top: 8px; right: 8px; }
+.pick:has(.pick-c) { padding-right: 56px; }
+.tab-c { margin-left: 6px; }
 @media (max-width: 860px) {
   .layout { grid-template-columns: 1fr; }
   .picker { display: none; }
@@ -482,7 +585,23 @@ footer { color: var(--muted); font-size: 12.5px; padding: 24px 0 40px; border-to
     <p class="kicker">ForLife · Vera chat redesign · PM review</p>
     <h1>{{TITLE}}</h1>
     <div class="status"><span><b>Draft</b> for discussion</span><span>Question order not yet reviewed by a doctor</span><span>Updated {{UPDATED}}</span></div>
-    <details class="about"><summary>About this draft</summary>{{ABOUT}}</details>
+    <div class="cbar">
+      <button type="button" class="cbar-btn" id="c-on">💬 Turn on comments</button>
+      <form class="cbar-form" id="c-form" hidden>
+        <input id="c-name" placeholder="Your name" maxlength="40" autocomplete="name" aria-label="Your name" required>
+        <input id="c-pass" type="password" placeholder="Passcode" autocomplete="current-password" aria-label="Passcode" required>
+        <button type="submit" class="cbar-btn primary">Turn on</button>
+        <span class="c-err" id="c-form-err" role="alert"></span>
+      </form>
+      <div class="cbar-on" id="c-status" hidden>
+        <span>💬 Commenting as <b id="c-who"></b></span>
+        <span id="c-total"></span>
+        <span class="cbar-hint">Point at a line and click 💬, or select words and click <b>Comment</b>.</span>
+        <button type="button" class="linkish" id="c-refresh">Refresh</button>
+        <button type="button" class="linkish" id="c-off">Turn off</button>
+      </div>
+    </div>
+    <details class="about"><summary>About this draft</summary>{{ABOUT}}<div class="orphans" data-orphans="about"></div></details>
     <nav class="tabs" aria-label="Sections">{{TABS}}</nav>
   </div>
 </div>
@@ -501,6 +620,7 @@ footer { color: var(--muted); font-size: 12.5px; padding: 24px 0 40px; border-to
         <div class="mobile-pick"><label for="ep-select">Episode</label><select id="ep-select">{{SELECT}}</select></div>
         {{ARTICLES}}
         <details class="howto"><summary>How these were rebuilt, and all nine at a glance</summary>{{HOW_TO_READ}}{{SUMMARY}}</details>
+        <div class="orphans" data-orphans="episodes"></div>
       </div>
     </div>
   </div>
@@ -534,6 +654,334 @@ footer { color: var(--muted); font-size: 12.5px; padding: 24px 0 40px; border-to
   if (select) select.addEventListener('change', function () { location.hash = 'episode-' + select.value; });
   window.addEventListener('hashchange', function () { show(location.hash); window.scrollTo({ top: 0 }); });
   show(location.hash);
+})();
+</script>
+<script>
+/* Comments: stored in Supabase, reached only through passcode-checked functions. All comment text is set with
+   textContent, never as HTML. */
+(function () {
+  var CFG = { url: '{{SB_URL}}', key: '{{SB_KEY}}' };
+  function get(k) { try { return localStorage.getItem('review_' + k); } catch (e) { return null; } }
+  function put(k, v) { try { if (v == null) localStorage.removeItem('review_' + k); else localStorage.setItem('review_' + k, v); } catch (e) {} }
+  var S = { pass: get('pass'), name: get('name'), list: [], on: false, open: null };
+  var $ = function (id) { return document.getElementById(id); };
+  var hoverless = window.matchMedia && window.matchMedia('(hover: none)').matches;
+
+  function rpc(fn, args) {
+    return fetch(CFG.url + '/rest/v1/rpc/' + fn, {
+      method: 'POST',
+      headers: { apikey: CFG.key, Authorization: 'Bearer ' + CFG.key, 'Content-Type': 'application/json' },
+      body: JSON.stringify(args)
+    }).then(function (r) {
+      return r.text().then(function (t) {
+        var d = null;
+        try { d = t ? JSON.parse(t) : null; } catch (e) { /* not JSON */ }
+        if (!r.ok) throw new Error((d && d.message) || ('error ' + r.status));
+        return d;
+      });
+    });
+  }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function button(cls, text, fn) { var b = el('button', cls, text); b.type = 'button'; b.addEventListener('click', fn); return b; }
+  function when(iso) {
+    var d = new Date(iso), s = (Date.now() - d.getTime()) / 1000;
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.floor(s / 60) + ' min ago';
+    if (s < 86400) return Math.floor(s / 3600) + ' h ago';
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) + ', ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  }
+  function panelOf(section) { return (section.indexOf('ep-') === 0 || section === 'episodes') ? 'episodes' : section; }
+  function blockFor(anchor) { return document.querySelector('[data-c="' + CSS.escape(anchor) + '"]'); }
+  function btnHost(block) { return block.tagName === 'TR' ? block.lastElementChild : block; }
+  function lineText(block) {
+    var c = block.cloneNode(true);
+    c.querySelectorAll('.c-btn, .thread-wrap').forEach(function (x) { x.remove(); });
+    return c.textContent.replace(/\s+/g, ' ').trim().slice(0, 2000);
+  }
+  function byId(id) { for (var i = 0; i < S.list.length; i++) if (S.list[i].id === id) return S.list[i]; return null; }
+  function tops(anchor) { return S.list.filter(function (c) { return c.anchor === anchor && !c.parent_id; }); }
+  function replies(id) { return S.list.filter(function (c) { return c.parent_id === id; }); }
+
+  // ---------- one thread: the comments on one line, with a box to add one ----------
+  function buildThread(anchor, quote, keepOpen) {
+    var st = { replyTo: null, quote: quote || null };
+    var box = el('div', 'thread'); box.dataset.anchor = anchor;
+    var items = el('div', 't-items');
+    var ctx = el('div', 't-ctx');
+    var ta = el('textarea'); ta.placeholder = 'Add a comment…'; ta.maxLength = 4000; ta.setAttribute('aria-label', 'Your comment');
+    var err = el('span', 'c-err');
+    var post = button('cbar-btn primary', 'Comment', send);
+    var acts = el('div', 't-actions'); acts.append(post);
+    if (!keepOpen) acts.append(button('linkish', 'Close', function () { closeThread(); decorate(); }));
+    acts.append(err);
+    box.append(items, ctx, ta, acts);
+
+    function context() {
+      ctx.textContent = '';
+      var r = st.replyTo && byId(st.replyTo);
+      if (r) ctx.append(el('span', null, 'Replying to ' + r.author));
+      else if (st.quote) ctx.append(el('span', null, 'On the words'), el('q', null, st.quote));
+      ctx.hidden = !(r || st.quote);
+      if (!ctx.hidden) ctx.append(button('linkish', 'clear', function () { st.replyTo = null; st.quote = null; context(); }));
+      post.textContent = r ? 'Reply' : 'Comment';
+      ta.placeholder = r ? 'Write a reply…' : 'Add a comment…';
+    }
+    function fill() {
+      items.textContent = '';
+      var list = tops(anchor);
+      if (!list.length) items.append(el('p', 't-empty', 'No comments yet.'));
+      list.forEach(function (c) { items.append(item(c)); });
+    }
+    function item(c) {
+      var d = el('div', 'c-item');
+      var meta = el('div', 'c-meta'); meta.append(el('b', null, c.author), document.createTextNode(' · ' + when(c.created_at)));
+      meta.title = new Date(c.created_at).toLocaleString();
+      d.append(meta);
+      if (c.quote) d.append(el('div', 'c-q', '“' + c.quote + '”'));
+      d.append(el('div', 'c-body', c.body));
+      var acts = el('div', 'c-acts');
+      if (!c.parent_id) acts.append(button('linkish', 'Reply', function () { st.replyTo = c.id; st.quote = null; context(); ta.focus(); }));
+      var del = button('linkish', 'Delete', function () {
+        acts.textContent = '';
+        acts.append(el('span', null, c.parent_id ? 'Delete this reply?' : 'Delete this comment and its replies?'),
+          button('linkish', 'Yes, delete', function () { remove(c, acts); }),
+          button('linkish', 'No', function () { fill(); }));
+      });
+      acts.append(del);
+      d.append(acts);
+      var rs = replies(c.id);
+      if (rs.length) { var wrap = el('div', 'c-replies'); rs.forEach(function (x) { wrap.append(item(x)); }); d.append(wrap); }
+      return d;
+    }
+    function send() {
+      var body = ta.value.trim();
+      if (!body) { ta.focus(); return; }
+      var parent = st.replyTo ? byId(st.replyTo) : null;
+      var block = blockFor(anchor);
+      post.disabled = true; err.textContent = '';
+      rpc('add_comment', {
+        p_passcode: S.pass, p_anchor: anchor,
+        p_section: parent ? parent.section : anchor.split(':')[0],
+        p_line_text: block ? lineText(block) : (parent ? parent.line_text : ''),
+        p_quote: parent ? null : st.quote, p_parent_id: parent ? parent.id : null,
+        p_author: S.name, p_body: body
+      }).then(function (row) {
+        S.list.push(row); ta.value = ''; st.replyTo = null; st.quote = null;
+        context(); fill(); decorate();
+      }).catch(function (e) { err.textContent = 'Not saved: ' + e.message; })
+        .then(function () { post.disabled = false; });
+    }
+    function remove(c, acts) {
+      rpc('delete_comment', { p_passcode: S.pass, p_id: c.id }).then(function () {
+        var gone = {}; gone[c.id] = true;
+        S.list = S.list.filter(function (x) { return !gone[x.id] && !gone[x.parent_id]; });
+        refill(); decorate();
+      }).catch(function (e) { acts.textContent = ''; acts.append(el('span', 'c-err', 'Not deleted: ' + e.message)); });
+    }
+    box._fill = fill;
+    context(); fill();
+    return box;
+  }
+  function refill() { document.querySelectorAll('.thread').forEach(function (t) { if (t._fill) t._fill(); }); }
+
+  function closeThread() {
+    document.querySelectorAll('.thread-wrap.line').forEach(function (x) { x.remove(); });
+    S.open = null;
+  }
+  function openThread(anchor, quote) {
+    closeThread();
+    var block = blockFor(anchor);
+    if (!block) return;
+    S.open = anchor;
+    var box = buildThread(anchor, quote, false), wrap;
+    if (block.tagName === 'TR') {
+      wrap = el('tr', 'thread-wrap line thread-row');
+      var td = el('td'); td.colSpan = block.children.length; td.append(box); wrap.append(td);
+      block.after(wrap);
+    } else {
+      wrap = el('div', 'thread-wrap line'); wrap.append(box);
+      if (block.tagName === 'LI') block.append(wrap); else block.after(wrap);
+    }
+    decorate();
+    var ta = box.querySelector('textarea');
+    if (ta) ta.focus();
+  }
+
+  // ---------- markers on the page ----------
+  function setBadge(node, cls, n) {
+    var b = node.querySelector('.' + cls);
+    if (!n) { if (b) b.remove(); return; }
+    if (!b) { b = el('span', cls); node.append(b); }
+    b.textContent = '💬 ' + n;
+  }
+  function decorate() {
+    var count = {};
+    S.list.forEach(function (c) { count[c.anchor] = (count[c.anchor] || 0) + 1; });
+    document.querySelectorAll('[data-c]').forEach(function (block) {
+      var host = btnHost(block);
+      if (!host) return;
+      var b = host.querySelector(':scope > .c-btn');
+      if (!b) {
+        b = button('c-btn', '', function (ev) {
+          ev.stopPropagation();
+          if (S.open === block.dataset.c) { closeThread(); decorate(); } else openThread(block.dataset.c, null);
+        });
+        host.append(b);
+      }
+      var n = count[block.dataset.c] || 0;
+      b.textContent = n ? '💬 ' + n : '💬';
+      b.title = n ? n + (n > 1 ? ' comments' : ' comment') : 'Comment on this';
+      b.setAttribute('aria-label', b.title);
+      b.classList.toggle('has', n > 0);
+      b.classList.toggle('open', S.open === block.dataset.c);
+    });
+    document.querySelectorAll('.pick').forEach(function (p) {
+      setBadge(p, 'pick-c', S.list.filter(function (c) { return c.section === 'ep-' + p.dataset.ep; }).length);
+    });
+    document.querySelectorAll('.tab').forEach(function (t) {
+      setBadge(t, 'tab-c', S.list.filter(function (c) { return panelOf(c.section) === t.dataset.tab; }).length);
+    });
+    $('c-total').textContent = S.list.length + (S.list.length === 1 ? ' comment' : ' comments');
+    orphans();
+    highlight();
+  }
+
+  // comments whose line was reworded or removed: keep them visible at the end of their section
+  function orphans() {
+    var groups = {};
+    S.list.forEach(function (c) {
+      if (c.parent_id || blockFor(c.anchor)) return;
+      var box = document.querySelector('.orphans[data-orphans="' + CSS.escape(c.section) + '"]') || document.querySelector('.orphans[data-orphans="episodes"]');
+      var key = box.dataset.orphans;
+      (groups[key] = groups[key] || {})[c.anchor] = c.line_text;
+    });
+    document.querySelectorAll('.orphans').forEach(function (box) {
+      var g = groups[box.dataset.orphans] || {};
+      var sig = Object.keys(g).sort().join('|');
+      if (box.dataset.sig === sig) return;
+      box.dataset.sig = sig;
+      box.textContent = '';
+      if (!sig) return;
+      box.append(el('h4', null, 'Comments on lines that have changed since'));
+      Object.keys(g).forEach(function (a) {
+        box.append(el('div', 'orphan-line', 'The line was: ' + (g[a] || '(unknown)')));
+        var wrap = el('div', 'thread-wrap'); wrap.append(buildThread(a, null, true)); box.append(wrap);
+      });
+    });
+  }
+
+  // yellow highlight on the words a comment was made on
+  function findRange(root, quote) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) { return n.parentElement && n.parentElement.closest('.c-btn, .thread-wrap') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; }
+    });
+    var nodes = [], text = '', n;
+    while ((n = walker.nextNode())) { nodes.push([n, text.length]); text += n.data; }
+    var i = text.toLowerCase().indexOf(quote.toLowerCase());
+    if (i < 0) return null;
+    var end = i + quote.length, r = document.createRange(), started = false;
+    for (var k = 0; k < nodes.length; k++) {
+      var node = nodes[k][0], off = nodes[k][1], len = node.data.length;
+      if (!started && i < off + len) { r.setStart(node, i - off); started = true; }
+      if (started && end <= off + len) { r.setEnd(node, end - off); return r; }
+    }
+    return null;
+  }
+  function highlight() {
+    if (!window.CSS || !CSS.highlights || typeof Highlight === 'undefined') return;
+    var ranges = [];
+    S.list.forEach(function (c) {
+      if (!c.quote) return;
+      var b = blockFor(c.anchor);
+      var r = b && findRange(b, c.quote);
+      if (r) ranges.push(r);
+    });
+    CSS.highlights.set('cquote', new Highlight(...ranges));
+  }
+
+  // ---------- select words, then "Comment" ----------
+  var selBtn = button('sel-btn', 'Comment', function () {
+    if (!pending) return;
+    var p = pending; pending = null; selBtn.hidden = true;
+    var sel = window.getSelection(); if (sel) sel.removeAllRanges();
+    openThread(p.anchor, p.quote);
+  });
+  selBtn.hidden = true;
+  selBtn.addEventListener('mousedown', function (e) { e.preventDefault(); });
+  document.body.append(selBtn);
+  var pending = null;
+  function blockOf(node) {
+    var e = node && (node.nodeType === 1 ? node : node.parentElement);
+    if (!e || e.closest('.thread-wrap, .c-btn, .cbar, .sel-btn')) return null;
+    return e.closest('[data-c]');
+  }
+  function onSelect() {
+    if (!S.on) return;
+    var sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) { selBtn.hidden = true; return; }
+    var q = sel.toString().replace(/\s+/g, ' ').trim();
+    var r = sel.getRangeAt(0), a = blockOf(r.startContainer), b = blockOf(r.endContainer);
+    if (!q || !a || a !== b || q.length > 1000) { selBtn.hidden = true; return; }
+    var rect = r.getBoundingClientRect();
+    selBtn.style.top = Math.max(0, rect.top + window.scrollY - 42) + 'px';
+    selBtn.style.left = Math.min(document.documentElement.clientWidth - 120, Math.max(8, rect.left + window.scrollX)) + 'px';
+    selBtn.hidden = false;
+    pending = { anchor: a.dataset.c, quote: q };
+  }
+  document.addEventListener('mouseup', function () { setTimeout(onSelect, 0); });
+  document.addEventListener('keyup', function (e) { if (e.shiftKey) onSelect(); });
+  document.addEventListener('selectionchange', function () { if (hoverless) setTimeout(onSelect, 300); });
+  document.addEventListener('mousedown', function (e) { if (e.target !== selBtn) selBtn.hidden = true; });
+
+  // phones have no hover: a tap on a line shows its 💬
+  document.addEventListener('click', function (e) {
+    if (!S.on || !hoverless || e.target.closest('a, button, input, textarea, select, .thread-wrap')) return;
+    var b = e.target.closest('[data-c]');
+    document.querySelectorAll('.tapped').forEach(function (x) { if (x !== b) x.classList.remove('tapped'); });
+    if (b) b.classList.add('tapped');
+  });
+
+  // ---------- turning comments on and off ----------
+  function turnOn(name, pass) {
+    return rpc('list_comments', { p_passcode: pass }).then(function (rows) {
+      S.name = name; S.pass = pass; put('name', name); put('pass', pass);
+      S.list = rows || []; S.on = true;
+      document.body.classList.add('commenting');
+      $('c-on').hidden = true; $('c-form').hidden = true; $('c-status').hidden = false;
+      $('c-who').textContent = name;
+      decorate();
+    });
+  }
+  function turnOff() {
+    S.on = false; S.list = []; S.open = null; put('pass', null);
+    document.body.classList.remove('commenting');
+    document.querySelectorAll('.c-btn, .thread-wrap, .pick-c, .tab-c').forEach(function (x) { x.remove(); });
+    document.querySelectorAll('.orphans').forEach(function (x) { x.textContent = ''; delete x.dataset.sig; });
+    if (window.CSS && CSS.highlights) CSS.highlights.delete('cquote');
+    $('c-status').hidden = true; $('c-on').hidden = false;
+  }
+  function refresh() {
+    if (!S.on) return;
+    rpc('list_comments', { p_passcode: S.pass }).then(function (rows) { S.list = rows || []; refill(); decorate(); }).catch(function () {});
+  }
+  $('c-on').addEventListener('click', function () {
+    $('c-on').hidden = true; $('c-form').hidden = false;
+    $('c-name').value = S.name || '';
+    ($('c-name').value ? $('c-pass') : $('c-name')).focus();
+  });
+  $('c-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var n = $('c-name').value.trim(), p = $('c-pass').value;
+    if (!n || !p) return;
+    $('c-form-err').textContent = 'Checking…';
+    turnOn(n, p).then(function () { $('c-form-err').textContent = ''; $('c-pass').value = ''; })
+      .catch(function (err) { $('c-form-err').textContent = /passcode/.test(err.message) ? 'That passcode is not right.' : 'Could not connect: ' + err.message; });
+  });
+  $('c-off').addEventListener('click', turnOff);
+  $('c-refresh').addEventListener('click', refresh);
+  setInterval(function () { if (S.on && document.visibilityState === 'visible' && !document.querySelector('.thread textarea:focus')) refresh(); }, 45000);
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') refresh(); });
+  if (S.pass && S.name) turnOn(S.name, S.pass).catch(function () { put('pass', null); });
 })();
 </script>
 </body>
